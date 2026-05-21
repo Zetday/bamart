@@ -1,4 +1,4 @@
-# Project Bamart2
+# Bamart
 
 This repository contains the backend and frontend code for Project Bamart2.
 
