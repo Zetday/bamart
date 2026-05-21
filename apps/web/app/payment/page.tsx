@@ -1,0 +1,16 @@
+import { Suspense } from 'react';
+import PaymentClient from './PaymentClient';
+
+export default function PaymentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-6 text-center text-gray-500">
+          Memuat halaman pembayaran...
+        </div>
+      }
+    >
+      <PaymentClient />
+    </Suspense>
+  );
+}

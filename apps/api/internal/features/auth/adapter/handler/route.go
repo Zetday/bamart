@@ -1,0 +1,20 @@
+package handler
+
+import "github.com/gofiber/fiber/v3"
+
+// RegisterRoutes mounts all auth endpoints onto the given router group.
+// jwtMiddleware is injected so this file has no import on pkg/token directly.
+func RegisterRoutes(router fiber.Router, h *AuthHandler, jwtMiddleware fiber.Handler) {
+	auth := router.Group("/auth")
+
+	// Public
+	auth.Post("/register", h.Register)
+	auth.Post("/login", h.Login)
+	auth.Post("/logout", h.Logout)
+
+	// Protected
+	auth.Get("/me", jwtMiddleware, h.Me)
+
+	// Brands (public)
+	router.Get("/brands", h.GetBrands)
+}
