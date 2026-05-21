@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import CheckoutBreadcrumb from '@/components/CheckoutBreadCrumb';
@@ -47,8 +47,8 @@ export default function CartPage() {
     latestQtyRef.current[cartItemId] = qty;
 
     // optimistic UI
-    setCart((prev) =>
-      prev.map((c) =>
+    setCart((prev: CartItem[]) =>
+      prev.map((c: CartItem) =>
         c.id === cartItemId
           ? { ...c, quantity: qty, subtotal: qty * c.item.price }
           : c
@@ -88,7 +88,7 @@ export default function CartPage() {
     setIsCartSyncing(true);
 
     // optimistic
-    setCart((prev) => prev.filter((c) => c.id !== cartItemId));
+    setCart((prev: CartItem[]) => prev.filter((c: CartItem) => c.id !== cartItemId));
 
     await fetch('/api/cart/remove', {
       method: 'DELETE',
@@ -100,12 +100,12 @@ export default function CartPage() {
     setIsCartSyncing(false);
   }
 
-  const total = cart.reduce((sum, c) => sum + c.subtotal, 0);
+  const total = cart.reduce((sum: number, c: CartItem) => sum + c.subtotal, 0);
 
   if (loading)
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 pt-5">
-        <div className="mx-auto max-w-screen-xl px-4 pt-18">
+        <div className="mx-auto max-w-7xl px-4 pt-18">
           <div className="mt-6 lg:flex lg:items-start xl:gap-8">
             {/* LEFT */}
             <div className="w-full space-y-6 lg:max-w-2xl xl:max-w-4xl">
@@ -128,7 +128,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-5">
       {/* Tambahkan padding-top agar breadcrumb tidak tertutup */}
-      <div className="mx-auto max-w-screen-xl px-4 pt-18">
+      <div className="mx-auto max-w-7xl px-4 pt-18">
         <CheckoutBreadcrumb current="cart" />
 
         <div className="mt-6 lg:flex lg:items-start xl:gap-8">
@@ -230,7 +230,7 @@ export default function CartPage() {
               {/* CHECKOUT BUTTON */}
               <Link
                 href={cart.length === 0 || isCartSyncing ? '#' : '/checkout'}
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                   if (cart.length === 0 || isCartSyncing) {
                     e.preventDefault();
                     return;

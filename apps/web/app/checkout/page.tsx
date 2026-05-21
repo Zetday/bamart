@@ -2,7 +2,7 @@
 
 import CheckoutBreadcrumb from '@/components/CheckoutBreadCrumb';
 import Link from 'next/link';
-import { useEffect, useState, FormEvent } from 'react';
+import React, { useEffect, useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
@@ -90,7 +90,7 @@ export default function CheckoutPage() {
     <>
       <form
         onSubmit={handleSubmit}
-        className="mx-auto max-w-screen-xl px-4 2xl:px-0 py-6 pt-23"
+        className="mx-auto max-w-7xl px-4 2xl:px-0 py-6 pt-23"
       >
         <CheckoutBreadcrumb current="checkout" />
 
