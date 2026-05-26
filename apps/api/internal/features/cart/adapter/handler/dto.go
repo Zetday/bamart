@@ -17,13 +17,14 @@ type UpdateCartQuantityRequest struct {
 }
 
 type CartItemResponse struct {
-	ID        uint   `json:"id"`
-	CartID    uint   `json:"cartId"`
-	ItemID    uint   `json:"itemId"`
-	ItemName  string `json:"itemName"`
-	ItemPrice int    `json:"itemPrice"`
-	Quantity  int    `json:"quantity"`
-	Subtotal  int    `json:"subtotal"`
+	ID           uint   `json:"id"`
+	CartID       uint   `json:"cartId"`
+	ItemID       uint   `json:"itemId"`
+	ItemName     string `json:"itemName"`
+	ItemPrice    int    `json:"itemPrice"`
+	ItemImageUrl string `json:"itemImageUrl"`
+	Quantity     int    `json:"quantity"`
+	Subtotal     int    `json:"subtotal"`
 }
 
 type CartResponse struct {
@@ -46,13 +47,14 @@ func FromDomain(c *domain.Cart) CartResponse {
 
 	for _, it := range c.Items {
 		res.Items = append(res.Items, CartItemResponse{
-			ID:        it.ID,
-			CartID:    it.CartID,
-			ItemID:    it.ItemID,
-			ItemName:  it.ItemName,
-			ItemPrice: it.ItemPrice,
-			Quantity:  it.Quantity,
-			Subtotal:  it.Subtotal,
+			ID:           it.ID,
+			CartID:       it.CartID,
+			ItemID:       it.ItemID,
+			ItemName:     it.ItemName,
+			ItemPrice:    it.ItemPrice,
+			ItemImageUrl: it.ItemImageUrl,
+			Quantity:     it.Quantity,
+			Subtotal:     it.Subtotal,
 		})
 	}
 	return res

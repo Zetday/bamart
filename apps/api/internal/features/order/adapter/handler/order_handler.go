@@ -156,11 +156,12 @@ func (h *OrderHandler) PayOrder(c fiber.Ctx) error {
 		return response.BadRequest(c, "Invalid body")
 	}
 
-	if req.OrderID == 0 {
-		return response.BadRequest(c, "Missing orderId in body")
+	orderID := parseOrderID(req.OrderID)
+	if orderID == 0 {
+		return response.BadRequest(c, "Missing or invalid orderId in body")
 	}
 
-	redirect, err := h.uc.PayOrder(req.OrderID, userID)
+	redirect, err := h.uc.PayOrder(orderID, userID)
 	if err != nil {
 		return response.FromAppError(c, err)
 	}
@@ -259,11 +260,12 @@ func (h *OrderHandler) PayOrderCompat(c fiber.Ctx) error {
 		return response.BadRequest(c, "Invalid body")
 	}
 
-	if req.OrderID == 0 {
-		return response.BadRequest(c, "Missing orderId in body")
+	orderID := parseOrderID(req.OrderID)
+	if orderID == 0 {
+		return response.BadRequest(c, "Missing or invalid orderId in body")
 	}
 
-	redirect, err := h.uc.PayOrder(req.OrderID, userID)
+	redirect, err := h.uc.PayOrder(orderID, userID)
 	if err != nil {
 		return response.FromAppError(c, err)
 	}
@@ -271,4 +273,24 @@ func (h *OrderHandler) PayOrderCompat(c fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"redirect": redirect,
 	})
+}
+
+func parseOrderID(val interface{}) uint {
+	if val == nil {
+		return 0
+	}
+	switch v := val.(type) {
+	case float64:
+		return uint(v)
+	case float32:
+		return uint(v)
+	case int:
+		return uint(v)
+	case int64:
+		return uint(v)
+	case string:
+		id, _ := strconv.ParseUint(v, 10, 32)
+		return uint(id)
+	}
+	return 0
 }

@@ -48,10 +48,11 @@ type orderItemRecord struct {
 func (orderItemRecord) TableName() string { return "order_items" }
 
 type itemMinimal struct {
-	ID     uint
-	Name   string
-	Price  int
-	UserID uint
+	ID       uint
+	Name     string
+	Price    int
+	UserID   uint
+	ImageUrl string `gorm:"column:image_url"`
 }
 
 func (itemMinimal) TableName() string { return "items" }
@@ -101,13 +102,15 @@ func toDomainOrder(r *orderRecord) *domain.Order {
 
 func toDomainOrderItem(r *orderItemRecord) *domain.OrderItem {
 	return &domain.OrderItem{
-		ID:       r.ID,
-		OrderID:  r.OrderID,
-		ItemID:   r.ItemID,
-		ItemName: r.Item.Name,
-		Quantity: r.Quantity,
-		Subtotal: r.Subtotal,
-		SellerID: r.Item.UserID,
+		ID:           r.ID,
+		OrderID:      r.OrderID,
+		ItemID:       r.ItemID,
+		ItemName:     r.Item.Name,
+		ItemPrice:    r.Item.Price,
+		ItemImageUrl: r.Item.ImageUrl,
+		Quantity:     r.Quantity,
+		Subtotal:     r.Subtotal,
+		SellerID:     r.Item.UserID,
 	}
 }
 
@@ -306,4 +309,8 @@ func (r *gormOrderRepository) ClearCartItemsByUserID(userID uint) error {
 		return err
 	}
 	return r.db.Where("cart_id = ?", cart.ID).Delete(&cartItemRecord{}).Error
+}
+
+func (r *gormOrderRepository) DecreaseItemStock(itemID uint, qty int) error {
+	return r.db.Exec("UPDATE items SET stock = stock - ? WHERE id = ?", qty, itemID).Error
 }

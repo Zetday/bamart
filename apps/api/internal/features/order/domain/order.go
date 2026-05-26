@@ -3,13 +3,15 @@ package domain
 import "time"
 
 type OrderItem struct {
-	ID       uint
-	OrderID  uint
-	ItemID   uint
-	ItemName string
-	Quantity int
-	Subtotal int
-	SellerID uint
+	ID           uint
+	OrderID      uint
+	ItemID       uint
+	ItemName     string
+	ItemPrice    int
+	ItemImageUrl string
+	Quantity     int
+	Subtotal     int
+	SellerID     uint
 }
 
 type CartItemDTO struct {

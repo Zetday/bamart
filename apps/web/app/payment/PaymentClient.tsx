@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState, FormEvent } from 'react';
 import Link from 'next/link';
 import CheckoutBreadcrumb from '@/components/CheckoutBreadCrumb';
+import toast from 'react-hot-toast';
 
 export default function PaymentPage() {
   const params = useSearchParams();
@@ -64,22 +65,35 @@ export default function PaymentPage() {
     // Simulasi proses pembayaran 2 detik (seperti gateway asli)
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Kirim mock ke server (opsional)
-    await fetch('/api/order/pay', {
-      method: 'POST',
-      body: JSON.stringify({
-        orderId,
-        method,
-        bank,
-        vaNumber,
-        mockSuccess: true, // tanda untuk backend (opsional)
-      }),
-    });
+    try {
+      // Kirim mock ke server
+      const res = await fetch('/api/order/pay', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: orderId ? Number(orderId) : 0,
+          method,
+          bank,
+          vaNumber,
+          mockSuccess: true, // tanda untuk backend (opsional)
+        }),
+      });
 
-    // Redirect ke halaman sukses mock
-    router.push(`/success?orderId=${orderId}`);
+      if (!res.ok) {
+        toast.error('Gagal memproses pembayaran');
+        setLoading(false);
+        return;
+      }
 
-    setLoading(false);
+      // Redirect ke halaman sukses mock
+      router.push(`/success?orderId=${orderId}`);
+    } catch {
+      toast.error('Terjadi kesalahan saat memproses pembayaran');
+    } finally {
+      setLoading(false);
+    }
   }
 
   /* -----------------------------------

@@ -74,10 +74,11 @@ export default function CheckoutPage() {
       body: JSON.stringify({ ...payload, delivery }),
     });
 
-    const data: { redirect?: string } = await res.json();
+    const result = await res.json();
+    const redirectUrl = result.data?.redirect || result.redirect;
 
-    if (data.redirect) {
-      router.push(data.redirect);
+    if (redirectUrl) {
+      router.push(redirectUrl);
     }
 
     setLoading(false);

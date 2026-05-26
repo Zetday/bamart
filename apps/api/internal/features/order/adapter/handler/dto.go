@@ -28,7 +28,7 @@ type UpdateOrderRequest struct {
 }
 
 type PayOrderRequest struct {
-	OrderID uint `json:"orderId"`
+	OrderID interface{} `json:"orderId"`
 }
 
 type OrderResponse struct {
@@ -47,13 +47,15 @@ type OrderResponse struct {
 }
 
 type OrderItemResponse struct {
-	ID       uint   `json:"id"`
-	OrderID  uint   `json:"orderId"`
-	ItemID   uint   `json:"itemId"`
-	ItemName string `json:"itemName"`
-	Quantity int    `json:"quantity"`
-	Subtotal int    `json:"subtotal"`
-	SellerID uint   `json:"sellerId"`
+	ID           uint   `json:"id"`
+	OrderID      uint   `json:"orderId"`
+	ItemID       uint   `json:"itemId"`
+	ItemName     string `json:"itemName"`
+	ItemPrice    int    `json:"itemPrice"`
+	ItemImageUrl string `json:"itemImageUrl"`
+	Quantity     int    `json:"quantity"`
+	Subtotal     int    `json:"subtotal"`
+	SellerID     uint   `json:"sellerId"`
 }
 
 func FromDomain(o *domain.Order) OrderResponse {
@@ -72,13 +74,15 @@ func FromDomain(o *domain.Order) OrderResponse {
 	}
 	for _, it := range o.Items {
 		res.Items = append(res.Items, OrderItemResponse{
-			ID:       it.ID,
-			OrderID:  o.ID,
-			ItemID:   it.ItemID,
-			ItemName: it.ItemName,
-			Quantity: it.Quantity,
-			Subtotal: it.Subtotal,
-			SellerID: it.SellerID,
+			ID:           it.ID,
+			OrderID:      o.ID,
+			ItemID:       it.ItemID,
+			ItemName:     it.ItemName,
+			ItemPrice:    it.ItemPrice,
+			ItemImageUrl: it.ItemImageUrl,
+			Quantity:     it.Quantity,
+			Subtotal:     it.Subtotal,
+			SellerID:     it.SellerID,
 		})
 	}
 	return res

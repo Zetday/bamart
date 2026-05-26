@@ -101,7 +101,7 @@ func (uc *orderUseCase) Checkout(input CheckoutInput) (string, error) {
 
 	order := &domain.Order{
 		UserID:     input.UserID,
-		OrderDate:  time.Now(),
+		OrderDate:  time.Now().UTC(),
 		TotalPrice: totalPrice,
 		Status:     "PENDING",
 		FullName:   input.FullName,
@@ -110,8 +110,8 @@ func (uc *orderUseCase) Checkout(input CheckoutInput) (string, error) {
 		City:       input.City,
 		PostalCode: input.PostalCode,
 		Notes:      input.Notes,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+		CreatedAt:  time.Now().UTC(),
+		UpdatedAt:  time.Now().UTC(),
 	}
 
 	for _, ci := range cartItems {
@@ -126,9 +126,6 @@ func (uc *orderUseCase) Checkout(input CheckoutInput) (string, error) {
 	if err := uc.repo.Create(order); err != nil {
 		return "", err
 	}
-
-	// Kosongkan cart
-	_ = uc.repo.ClearCartItemsByUserID(input.UserID)
 
 	redirectURL := "/payment?orderId=" + strconv.Itoa(int(order.ID))
 	return redirectURL, nil
@@ -149,7 +146,7 @@ func (uc *orderUseCase) Update(id uint, input UpdateOrderInput) (*domain.Order, 
 	order.City = input.City
 	order.PostalCode = input.PostalCode
 	order.Notes = input.Notes
-	order.UpdatedAt = time.Now()
+	order.UpdatedAt = time.Now().UTC()
 
 	if err := uc.repo.Update(order); err != nil {
 		return nil, err
@@ -187,6 +184,14 @@ func (uc *orderUseCase) PayOrder(orderID uint, userID uint) (string, error) {
 	if err := uc.repo.UpdateStatus(orderID, "PAID"); err != nil {
 		return "", err
 	}
+
+	// Decrease item stock
+	for _, it := range order.Items {
+		_ = uc.repo.DecreaseItemStock(it.ItemID, it.Quantity)
+	}
+
+	// Clear user cart
+	_ = uc.repo.ClearCartItemsByUserID(userID)
 
 	redirectURL := "/success?orderId=" + strconv.Itoa(int(order.ID))
 	return redirectURL, nil

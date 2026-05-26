@@ -9,14 +9,13 @@ import OrderSummarySkeleton from '@/components/skeleton/OrderSummarySkeleton';
 
 interface CartItem {
   id: number;
+  cartId: number;
+  itemId: number;
+  itemName: string;
+  itemPrice: number;
+  itemImageUrl: string | null;
   quantity: number;
   subtotal: number;
-  item: {
-    id: number;
-    name: string;
-    price: number;
-    imageUrl: string | null;
-  };
 }
 
 export default function CartPage() {
@@ -50,7 +49,7 @@ export default function CartPage() {
     setCart((prev: CartItem[]) =>
       prev.map((c: CartItem) =>
         c.id === cartItemId
-          ? { ...c, quantity: qty, subtotal: qty * c.item.price }
+          ? { ...c, quantity: qty, subtotal: qty * c.itemPrice }
           : c
       )
     );
@@ -150,10 +149,10 @@ export default function CartPage() {
                   <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
                     {/* IMAGE */}
                     <Image
-                      src={c.item.imageUrl || '/placeholder.png'}
+                      src={c.itemImageUrl || '/placeholder.png'}
                       width={80}
                       height={80}
-                      alt={c.item.name}
+                      alt={c.itemName}
                       className="rounded-md object-cover shrink-0 md:order-1"
                     />
 
@@ -192,7 +191,7 @@ export default function CartPage() {
                     {/* DETAILS */}
                     <div className="w-full md:max-w-md md:order-2 space-y-3">
                       <p className="text-base font-medium text-gray-900 dark:text-white">
-                        {c.item.name}
+                        {c.itemName}
                       </p>
 
                       <button

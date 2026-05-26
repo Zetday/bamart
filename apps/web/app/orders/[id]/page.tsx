@@ -9,7 +9,10 @@ interface OrderItem {
   id: number;
   quantity: number;
   subtotal: number;
-  item: {
+  itemName?: string;
+  itemPrice?: number;
+  itemImageUrl?: string | null;
+  item?: {
     id: number;
     name: string;
     price: number;
@@ -85,35 +88,43 @@ export default function OrderDetailPage() {
         <h3 className="text-lg font-semibold mb-3">Produk yang Dibeli</h3>
 
         <div className="space-y-4 mb-8">
-          {order.items.map((ci) => (
-            <div
-              key={ci.id}
-              className="flex items-center gap-4 rounded-lg border p-4 bg-white"
-            >
-              <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden">
-                {ci.item.imageUrl ? (
-                  <img
-                    src={ci.item.imageUrl}
-                    alt={ci.item.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-300" />
-                )}
-              </div>
+          {order.items.map((ci) => {
+            const name = ci.itemName || ci.item?.name || 'Barang';
+            const imageUrl = ci.itemImageUrl || ci.item?.imageUrl;
+            const price = ci.itemPrice ?? ci.item?.price ?? (ci.quantity > 0 ? ci.subtotal / ci.quantity : 0);
 
-              <div className="flex-1">
-                <p className="font-semibold text-gray-900">{ci.item.name}</p>
-                <p className="text-sm text-gray-500">
-                  {ci.quantity} × Rp {ci.item.price.toLocaleString('id-ID')}
+            return (
+              <div
+                key={ci.id}
+                className="flex items-center gap-4 rounded-lg border p-4 bg-white"
+              >
+                <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden">
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-300 flex items-center justify-center text-xs text-gray-400 font-medium">
+                      No Image
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-900">{name}</p>
+                  <p className="text-sm text-gray-500">
+                    {ci.quantity} × Rp {price.toLocaleString('id-ID')}
+                  </p>
+                </div>
+
+                <p className="font-semibold text-gray-900">
+                  Rp {ci.subtotal.toLocaleString('id-ID')}
                 </p>
               </div>
-
-              <p className="font-semibold text-gray-900">
-                Rp {ci.subtotal.toLocaleString('id-ID')}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* ===========================

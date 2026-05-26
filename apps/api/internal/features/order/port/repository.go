@@ -15,4 +15,5 @@ type OrderRepository interface {
 
 	GetCartItemsByUserID(userID uint) ([]domain.CartItemDTO, error)
 	ClearCartItemsByUserID(userID uint) error
+	DecreaseItemStock(itemID uint, qty int) error
 }

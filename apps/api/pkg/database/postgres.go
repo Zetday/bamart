@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"time"
 
 	"project-bamart2/apps/api/pkg/config"
 
@@ -15,6 +16,9 @@ import (
 func Connect(cfg *config.Config) *gorm.DB {
 	db, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
+		NowFunc: func() time.Time {
+			return time.Now().UTC()
+		},
 	})
 	if err != nil {
 		log.Fatalf("[database] failed to connect: %v", err)
