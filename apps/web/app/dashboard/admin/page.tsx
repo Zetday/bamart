@@ -14,7 +14,7 @@ export default async function AdminDashboardPage() {
   if (!user) redirect('/login');
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-slate-950">
       <DashboardSidebar
         role="ADMIN"
         userName={user.name}

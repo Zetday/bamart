@@ -88,7 +88,7 @@ export default function OrdersTableClient({
       const res = await fetch(`/api/orders/${row.id}`);
       const data: OrderDetail = await res.json();
       setDetailData(data);
-    } catch (error) {
+    } catch {
       toast.error('Gagal memuat detail order');
     } finally {
       setLoadingDetail(false);
@@ -124,25 +124,17 @@ export default function OrdersTableClient({
   };
 
   return (
-    <div className="p-8 bg-gradient-to-br from-gray-50 to-purple-50 min-h-screen">
+    <div className="flex-1 bg-slate-50 min-h-screen p-8">
       {/* HEADER */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-          <ShoppingCart className="text-white" size={24} />
-        </div>
-        <div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Daftar Order
-          </h2>
-          <p className="text-gray-600 text-sm">Manage all orders</p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Daftar Order</h1>
+        <p className="text-slate-500 text-sm mt-1">Kelola semua pesanan</p>
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <DataTable<OrderRow>
           columns={[
-            { key: 'id', label: 'ID' },
             { key: 'buyer', label: 'Pembeli' },
             {
               key: 'totalPrice',
@@ -187,6 +179,7 @@ export default function OrdersTableClient({
                 }),
             },
           ]}
+          showIndex
           data={data}
           actions={(row) => (
             <div className="flex justify-end">
@@ -215,28 +208,25 @@ export default function OrdersTableClient({
       {/* DELETE MODAL */}
       <Modal open={openDelete} onClose={() => setOpenDelete(false)}>
         <div className="text-center p-6">
-          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-            <Trash2 className="text-red-600" size={32} />
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+            <Trash2 className="text-red-500" size={28} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-xl font-bold text-slate-900 mb-1">
             Hapus Order #{selected?.id}?
           </h2>
-
-          <p className="text-gray-600 mb-6">
+          <p className="text-slate-500 text-sm mb-6">
             Yakin ingin menghapus order milik{' '}
-            <b className="text-gray-800">{selected?.buyer}</b>?
+            <span className="font-semibold text-slate-700">{selected?.buyer}</span>?
           </p>
-
           <div className="flex justify-center gap-3">
             <button
-              className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 rounded-xl font-medium transition-all duration-300"
+              className="px-5 py-2.5 text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
               onClick={() => setOpenDelete(false)}
             >
               Batal
             </button>
-
             <button
-              className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300"
+              className="px-5 py-2.5 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
               onClick={deleteOrder}
             >
               Hapus
@@ -254,14 +244,14 @@ export default function OrdersTableClient({
         ) : detailData ? (
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                <Receipt className="text-white" size={24} />
+              <div className="w-9 h-9 rounded-lg bg-[#7D1972] flex items-center justify-center shrink-0">
+                <Receipt className="text-white" size={18} />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="text-lg font-bold text-slate-900">
                   Detail Order #{detailData.id}
                 </h2>
-                <p className="text-sm text-gray-600">Order information</p>
+                <p className="text-xs text-slate-500">Informasi pesanan</p>
               </div>
             </div>
 
@@ -323,10 +313,10 @@ export default function OrdersTableClient({
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white p-4 rounded-xl">
+            <div className="bg-[#7D1972] text-white p-4 rounded-xl">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Total Pembayaran</span>
-                <span className="text-2xl font-bold">
+                <span className="text-sm font-semibold">Total Pembayaran</span>
+                <span className="text-xl font-bold">
                   Rp {detailData.totalPrice.toLocaleString('id-ID')}
                 </span>
               </div>
@@ -367,10 +357,10 @@ function OrderForm({
     >
       {/* HEADER (DIPADATKAN) */}
       <div className="flex items-center gap-2 mb-1">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+        <div className="w-9 h-9 rounded-lg bg-[#7D1972] flex items-center justify-center">
           <ShoppingCart className="text-white" size={18} />
         </div>
-        <h2 className="text-xl font-bold text-gray-800">Edit Order</h2>
+        <h2 className="text-xl font-bold text-slate-800">Edit Order</h2>
       </div>
 
       {/* BUYER */}
@@ -501,7 +491,7 @@ function OrderForm({
       </div>
 
       {/* SAVE BUTTON */}
-      <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white font-semibold hover:shadow-md transition">
+      <button className="w-full py-2.5 rounded-lg bg-[#7D1972] hover:bg-[#9c2292] text-white font-semibold transition-colors">
         Simpan
       </button>
     </form>

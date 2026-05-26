@@ -13,12 +13,14 @@ interface DataTableProps<T> {
   columns: DataColumn<T>[];
   data: T[];
   actions?: (row: T) => React.ReactNode;
+  showIndex?: boolean;
 }
 
 export default function DataTable<T>({
   columns,
   data,
   actions,
+  showIndex = false,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(10);
@@ -114,6 +116,11 @@ export default function DataTable<T>({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-gray-700 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-purple-50">
+              {showIndex && (
+                <th className="p-4 font-bold text-left uppercase tracking-wide text-xs w-14">
+                  No.
+                </th>
+              )}
               {columns.map((col) => {
                 const isSorted = sortField === col.key;
                 const icon =
@@ -155,6 +162,11 @@ export default function DataTable<T>({
                 key={i}
                 className="border-b border-gray-100 hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent transition-all duration-300"
               >
+                {showIndex && (
+                  <td className="p-4 text-gray-500 font-medium text-sm w-14">
+                    {start + i + 1}
+                  </td>
+                )}
                 {columns.map((col) => (
                   <td key={String(col.key)} className="p-4 text-gray-700">
                     {col.format

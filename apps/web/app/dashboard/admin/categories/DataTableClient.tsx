@@ -109,38 +109,30 @@ export default function DataTableClient({ rows }: { rows: CategoryRow[] }) {
   /* ---------------- RENDER ---------------- */
 
   return (
-    <div className="p-8 bg-linear-to-br from-gray-50 to-purple-50 min-h-screen">
+    <div className="flex-1 bg-slate-50 min-h-screen p-8">
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center shadow-lg">
-            <Tag className="text-white" size={24} />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold bg-linear-to-r from-[#7D1972] to-[#b14fab] bg-clip-text text-transparent">
-              Kelola Kategori
-            </h2>
-            <p className="text-gray-600 text-sm">Manage product categories</p>
-          </div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Kelola Kategori</h1>
+          <p className="text-slate-500 text-sm mt-1">Kelola kategori produk</p>
         </div>
-
         <button
-          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-[#7D1972] to-[#b14fab] text-white hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 font-medium"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#7D1972] hover:bg-[#9c2292] text-white text-sm font-medium rounded-lg transition-colors"
           onClick={doAdd}
         >
-          <Plus size={20} />
+          <Plus size={16} />
           Tambah Kategori
         </button>
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <DataTable
           columns={[
-            { key: 'id', label: 'ID' },
             { key: 'name', label: 'Nama Kategori' },
             { key: 'description', label: 'Deskripsi' },
           ]}
+          showIndex
           data={data}
           actions={(row) => (
             <ActionButtons
@@ -173,31 +165,27 @@ export default function DataTableClient({ rows }: { rows: CategoryRow[] }) {
       {/* DELETE MODAL */}
       <Modal open={openDelete} onClose={() => setOpenDelete(false)}>
         <div className="p-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-            <Tag className="text-red-600" size={32} />
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+            <Tag className="text-red-500" size={28} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-xl font-bold text-slate-900 mb-1">
             Hapus Kategori?
           </h2>
-          <p className="text-gray-600 mb-6">
-            Yakin ingin menghapus kategori{' '}
-            <b className="text-gray-800">{selected?.name}</b>?
-            <br />
-            <span className="text-sm text-red-600">
-              Kategori yang digunakan item tidak dapat dihapus
-            </span>
+          <p className="text-slate-500 text-sm mb-1">
+            Yakin ingin menghapus <span className="font-semibold text-slate-700">{selected?.name}</span>?
           </p>
+          <p className="text-xs text-red-500 mb-6">Kategori yang digunakan item tidak dapat dihapus.</p>
 
           <div className="flex justify-center gap-3">
             <button
-              className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 rounded-xl font-medium transition-all duration-300"
+              className="px-5 py-2.5 text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
               onClick={() => setOpenDelete(false)}
             >
               Batal
             </button>
 
             <button
-              className="px-6 py-2.5 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300"
+              className="px-5 py-2.5 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
               onClick={deleteCategory}
             >
               Hapus
@@ -234,10 +222,10 @@ function CategoryForm({
       onSubmit={handleSubmit}
     >
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center">
-          <Tag className="text-white" size={24} />
+        <div className="w-9 h-9 rounded-lg bg-[#7D1972] flex items-center justify-center shrink-0">
+          <Tag className="text-white" size={18} />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800">
+        <h2 className="text-lg font-bold text-slate-800">
           {initial ? 'Edit Kategori' : 'Tambah Kategori'}
         </h2>
       </div>
@@ -268,7 +256,7 @@ function CategoryForm({
         />
       </div>
 
-      <button className="py-3 rounded-xl bg-linear-to-r from-[#7D1972] to-[#b14fab] text-white font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300">
+      <button className="py-3 rounded-lg bg-[#7D1972] hover:bg-[#9c2292] text-white font-semibold transition-colors">
         Simpan
       </button>
     </form>

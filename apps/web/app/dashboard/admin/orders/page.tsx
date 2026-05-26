@@ -68,9 +68,9 @@ export default async function AdminOrdersPage() {
   }));
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-slate-950">
       <DashboardSidebar role="ADMIN" userName={user.name} userEmail={user.email} />
-      <div className="flex-1 bg-slate-50 p-6">
+      <div className="flex-1 overflow-y-auto bg-slate-50 p-6">
         <OrdersTableClient rows={rows} buyers={buyers} />
       </div>
     </div>

@@ -32,9 +32,9 @@ export default async function AdminCategoriesPage() {
   }));
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-slate-950">
       <DashboardSidebar role="ADMIN" userName={user.name} userEmail={user.email} />
-      <main className="flex-1 bg-slate-50 p-6">
+      <main className="flex-1 overflow-y-auto bg-slate-50 p-6">
         <DataTableClient rows={rows} />
       </main>
     </div>

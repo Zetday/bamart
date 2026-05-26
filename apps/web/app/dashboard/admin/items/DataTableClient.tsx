@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import NextImage from 'next/image';
 import DataTable from '@/components/DataTable';
 import ActionButtons from '@/components/ActionButtons';
 import Modal from '@/components/Modal';
 import toast from 'react-hot-toast';
-import { Plus, Package, Upload, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Package, Upload, Image as ImageIcon } from 'lucide-react';
 
 /* ---------------------------------------
         TYPES
@@ -47,45 +48,6 @@ export interface UserOption {
 export interface CategoryOption {
   id: number;
   name: string;
-}
-
-/* ---------------------------------------
-        SIDE PANEL
----------------------------------------- */
-
-function SidePanel({
-  open,
-  onClose,
-  title,
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-}) {
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-50">
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-
-      {/* Panel */}
-      <div className="absolute right-0 top-0 h-full w-full max-w-[520px] bg-white shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-bold text-gray-800">{title}</h2>
-          <button onClick={onClose}>
-            <X className="text-gray-500 hover:text-red-600" />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto p-6">{children}</div>
-      </div>
-    </div>
-  );
 }
 
 /* ---------------------------------------
@@ -177,42 +139,34 @@ export default function ItemsTableClient({
   };
 
   return (
-    <div className="p-8 bg-linear-to-br from-gray-50 to-purple-50 min-h-screen">
+    <div className="flex-1 bg-slate-50 min-h-screen p-8">
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center shadow-lg">
-            <Package className="text-white" size={24} />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold bg-linear-to-r from-[#7D1972] to-[#b14fab] bg-clip-text text-transparent">
-              Daftar Item
-            </h2>
-            <p className="text-gray-600 text-sm">Manage all products</p>
-          </div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Daftar Item</h1>
+          <p className="text-slate-500 text-sm mt-1">Kelola semua produk</p>
         </div>
-
         <button
           onClick={doAdd}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-[#7D1972] to-[#b14fab] text-white hover:shadow-lg hover:scale-105 transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#7D1972] hover:bg-[#9c2292] text-white text-sm font-medium rounded-lg transition-colors"
         >
-          <Plus size={20} />
+          <Plus size={16} />
           Tambah Item
         </button>
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <DataTable
           columns={[
-            { key: 'id', label: 'ID' },
-            {
-              key: 'imageUrl',
-              label: 'Gambar',
+            { key: 'imageUrl', label: 'Gambar',
               format: (value) => (
-                <img
+                <NextImage
                   src={(value as string) || '/placeholder.png'}
                   alt="Product"
+                  width={56}
+                  height={56}
+                  unoptimized
                   className="w-14 h-14 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
                 />
               ),
@@ -231,6 +185,7 @@ export default function ItemsTableClient({
             { key: 'category', label: 'Kategori' },
             { key: 'seller', label: 'Penjual' },
           ]}
+          showIndex
           data={data}
           actions={(row) => (
             <ActionButtons
@@ -242,40 +197,41 @@ export default function ItemsTableClient({
         />
       </div>
 
-      {/* SIDE PANEL FORM */}
-      <SidePanel
-        open={openForm}
-        onClose={() => setOpenForm(false)}
-        title={selected ? 'Edit Item' : 'Tambah Item'}
-      >
-        <ItemForm
-          initial={selected ?? undefined}
-          users={sellerUsers}
-          categories={categories}
-          onSubmit={(formData) =>
-            selected
-              ? updateItem({ ...formData, id: selected.id })
-              : addItem(formData)
-          }
-        />
-      </SidePanel>
+      {/* FORM MODAL - Centered */}
+      <Modal open={openForm} onClose={() => setOpenForm(false)}>
+        <div className="max-h-[85vh] overflow-y-auto p-3">
+          <ItemForm
+            initial={selected ?? undefined}
+            users={sellerUsers}
+            categories={categories}
+            onSubmit={(formData) =>
+              selected
+                ? updateItem({ ...formData, id: selected.id })
+                : addItem(formData)
+            }
+          />
+        </div>
+      </Modal>
 
       {/* DELETE MODAL */}
       <Modal open={openDelete} onClose={() => setOpenDelete(false)}>
         <div className="text-center p-6">
-          <h2 className="text-2xl font-bold mb-4">Hapus Item?</h2>
-          <p className="mb-6">
-            Yakin ingin menghapus <b>{selected?.name}</b>?
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+            <Package className="text-red-500" size={28} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-1">Hapus Item?</h2>
+          <p className="text-slate-500 text-sm mb-6">
+            Yakin ingin menghapus <span className="font-semibold text-slate-700">{selected?.name}</span>?
           </p>
           <div className="flex justify-center gap-3">
             <button
-              className="px-6 py-2 bg-gray-200 rounded-xl"
+              className="px-5 py-2.5 text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
               onClick={() => setOpenDelete(false)}
             >
               Batal
             </button>
             <button
-              className="px-6 py-2 bg-red-600 text-white rounded-xl"
+              className="px-5 py-2.5 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
               onClick={deleteItem}
             >
               Hapus
@@ -344,7 +300,11 @@ function ItemForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    initial ? onSubmit({ ...form, id: initial.id }) : onSubmit(form);
+    if (initial) {
+      onSubmit({ ...form, id: initial.id });
+    } else {
+      onSubmit(form);
+    }
   }
 
   return (
@@ -353,10 +313,10 @@ function ItemForm({
       className="grid grid-cols-1 md:grid-cols-2 gap-5"
     >
       <div className="flex items-center gap-3 mb-2 md:col-span-2">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center">
-          <Package className="text-white" size={24} />
+        <div className="w-9 h-9 rounded-lg bg-[#7D1972] flex items-center justify-center shrink-0">
+          <Package className="text-white" size={18} />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800">
+        <h2 className="text-lg font-bold text-slate-800">
           {initial ? 'Edit Item' : 'Tambah Item'}
         </h2>
       </div>
@@ -482,9 +442,12 @@ function ItemForm({
 
         <div className="border-2 border-dashed border-gray-300 p-6 rounded-xl flex flex-col items-center gap-4 hover:border-purple-500 transition-all duration-300 bg-gray-50">
           {preview ? (
-            <img
+            <NextImage
               src={preview}
               alt="Preview"
+              width={160}
+              height={160}
+              unoptimized
               className="w-40 h-40 object-cover rounded-xl shadow-lg"
             />
           ) : (
@@ -497,7 +460,7 @@ function ItemForm({
             type="button"
             onClick={() => document.getElementById('imageInput')?.click()}
             disabled={uploading}
-            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white rounded-xl font-medium hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#7D1972] hover:bg-[#9c2292] text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
           >
             <Upload size={18} />
             {uploading ? 'Uploading...' : 'Pilih Gambar'}
@@ -512,7 +475,7 @@ function ItemForm({
           />
         </div>
       </div>
-      <button className="md:col-span-2 py-3 rounded-xl bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white font-semibold">
+      <button className="md:col-span-2 py-3 rounded-lg bg-[#7D1972] hover:bg-[#9c2292] text-white font-semibold transition-colors">
         Simpan
       </button>
     </form>

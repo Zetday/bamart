@@ -69,9 +69,9 @@ export default async function SellerItemsPage() {
   }));
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-slate-950">
       <DashboardSidebar role="SELLER" userName={payload.name} userEmail={payload.email} />
-      <div className="flex-1 bg-slate-50 p-6">
+      <div className="flex-1 overflow-y-auto bg-slate-50 p-6">
         <SellerItemsTableClient
           rows={rows}
           sellerId={sellerId}
