@@ -115,3 +115,15 @@ func (r *gormUserRepository) FindAll() ([]domain.User, error) {
 	return users, nil
 }
 
+func (r *gormUserRepository) Update(user *domain.User) error {
+	return r.db.Model(&userRecord{}).Where("id = ?", user.ID).Updates(map[string]any{
+		"name":  user.Name,
+		"email": user.Email,
+		"role":  string(user.Role),
+	}).Error
+}
+
+func (r *gormUserRepository) Delete(id uint) error {
+	return r.db.Delete(&userRecord{}, id).Error
+}
+

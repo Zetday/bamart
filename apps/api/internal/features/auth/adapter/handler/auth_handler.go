@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"strconv"
 
 	"project-bamart2/apps/api/internal/features/auth/usecase"
 	"project-bamart2/apps/api/internal/shared/apperror"
@@ -144,5 +145,82 @@ func (h *AuthHandler) GetAllUsers(c fiber.Ctx) error {
 	}
 
 	return response.OK(c, "", res)
+}
+
+type CreateUserRequest struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Role  string `json:"role"`
+}
+
+type UpdateUserRequest struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Role  string `json:"role"`
+}
+
+// POST /api/users
+func (h *AuthHandler) CreateUser(c fiber.Ctx) error {
+	var req CreateUserRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return response.BadRequest(c, "Invalid request body")
+	}
+	if req.Name == "" || req.Email == "" || req.Role == "" {
+		return response.ValidationError(c, apperror.ErrMissingFields)
+	}
+
+	user, err := h.uc.CreateUser(req.Name, req.Email, req.Role)
+	if err != nil {
+		return response.FromAppError(c, err)
+	}
+
+	return response.Created(c, "User created successfully", UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+		Role:  string(user.Role),
+	})
+}
+
+// PUT /api/users/:id
+func (h *AuthHandler) UpdateUser(c fiber.Ctx) error {
+	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+	if err != nil {
+		return response.BadRequest(c, "Invalid ID format")
+	}
+
+	var req UpdateUserRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return response.BadRequest(c, "Invalid request body")
+	}
+	if req.Name == "" || req.Email == "" || req.Role == "" {
+		return response.ValidationError(c, apperror.ErrMissingFields)
+	}
+
+	user, err := h.uc.UpdateUser(uint(id), req.Name, req.Email, req.Role)
+	if err != nil {
+		return response.FromAppError(c, err)
+	}
+
+	return response.OK(c, "User updated successfully", UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+		Role:  string(user.Role),
+	})
+}
+
+// DELETE /api/users/:id
+func (h *AuthHandler) DeleteUser(c fiber.Ctx) error {
+	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+	if err != nil {
+		return response.BadRequest(c, "Invalid ID format")
+	}
+
+	if err := h.uc.DeleteUser(uint(id)); err != nil {
+		return response.FromAppError(c, err)
+	}
+
+	return response.OK(c, "User deleted successfully", nil)
 }
 

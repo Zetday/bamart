@@ -35,6 +35,9 @@ type AuthUseCase interface {
 	GetUserByID(id uint) (*domain.User, error)
 	GetBrands() ([]domain.User, error)
 	GetAllUsers(role string) ([]domain.User, error)
+	CreateUser(name, email, role string) (*domain.User, error)
+	UpdateUser(id uint, name, email, role string) (*domain.User, error)
+	DeleteUser(id uint) error
 }
 
 // ── Implementation ───────────────────────────────────────────────────────────
@@ -131,4 +134,73 @@ func (uc *authUseCase) GetAllUsers(role string) ([]domain.User, error) {
 		return uc.userRepo.FindByRole(role)
 	}
 	return uc.userRepo.FindAll()
+}
+
+func (uc *authUseCase) CreateUser(name, email, role string) (*domain.User, error) {
+	existing, err := uc.userRepo.FindByEmail(email)
+	if err == nil && existing != nil {
+		return nil, apperror.ErrEmailAlreadyUsed
+	}
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	r := domain.Role(role)
+	if !r.IsValid() {
+		return nil, apperror.ErrInvalidRole
+	}
+
+	user := &domain.User{
+		Name:      name,
+		Email:     email,
+		Password:  string(hashed),
+		Role:      r,
+		CreatedAt: time.Now(),
+	}
+
+	if err := uc.userRepo.Create(user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (uc *authUseCase) UpdateUser(id uint, name, email, role string) (*domain.User, error) {
+	user, err := uc.userRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if email != user.Email {
+		existing, err := uc.userRepo.FindByEmail(email)
+		if err == nil && existing != nil {
+			return nil, apperror.ErrEmailAlreadyUsed
+		}
+	}
+
+	r := domain.Role(role)
+	if !r.IsValid() {
+		return nil, apperror.ErrInvalidRole
+	}
+
+	user.Name = name
+	user.Email = email
+	user.Role = r
+
+	if err := uc.userRepo.Update(user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (uc *authUseCase) DeleteUser(id uint) error {
+	_, err := uc.userRepo.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	return uc.userRepo.Delete(id)
 }

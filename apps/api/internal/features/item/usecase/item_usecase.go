@@ -99,6 +99,9 @@ func (uc *itemUseCase) Update(id uint, input UpdateItemInput) (*domain.Item, err
 	item.Stock = input.Stock
 	item.ImageUrl = input.ImageUrl
 	item.CategoryID = input.CategoryID
+	if input.UserID != 0 {
+		item.UserID = input.UserID
+	}
 	item.UpdatedAt = time.Now()
 
 	if err := uc.repo.Update(item); err != nil {

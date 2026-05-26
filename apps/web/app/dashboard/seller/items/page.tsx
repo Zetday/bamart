@@ -2,6 +2,7 @@ import { cookies as getCookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import SellerItemsTableClient from './DataTableClient';
 import DashboardSidebar from '@/components/DashboardSidebar';
+import { redirect } from 'next/navigation';
 
 interface SellerItem {
   id: number;
@@ -22,19 +23,13 @@ export default async function SellerItemsPage() {
 
   console.log('TOKEN:', token);
 
-  if (!token) {
-    return <div>Akses ditolak. (Token tidak ditemukan)</div>;
-  }
+  if (!token) redirect('/login');
 
   const payload = verifyToken(token);
 
-  if (!payload) {
-    return <div>Akses ditolak. (Token invalid)</div>;
-  }
+  if (!payload) redirect('/login');
 
-  if (payload.role !== 'SELLER') {
-    return <div>Akses ditolak. (Bukan seller)</div>;
-  }
+  if (payload.role !== 'SELLER') redirect('/dashboard/admin');
 
   const sellerId = payload.id;
 
@@ -74,13 +69,13 @@ export default async function SellerItemsPage() {
   }));
 
   return (
-    <div className="flex min-h-screen">
-      <DashboardSidebar role="SELLER" />
-      <div className="flex-1 p-6">
+    <div className="flex min-h-screen bg-slate-950">
+      <DashboardSidebar role="SELLER" userName={payload.name} userEmail={payload.email} />
+      <div className="flex-1 bg-slate-50 p-6">
         <SellerItemsTableClient
           rows={rows}
           sellerId={sellerId}
-          categories={categories} // ← penting
+          categories={categories}
         />
       </div>
     </div>

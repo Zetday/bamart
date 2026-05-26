@@ -58,12 +58,14 @@ export default function DataTableClient({ rows }: { rows: CategoryRow[] }) {
 
     if (!res.ok) return toast.error('Gagal menambah kategori');
 
-    const newCategory: CategoryRow = await res.json();
-
-    setData((prev) => [...prev, newCategory]);
-    setOpenForm(false);
-
-    toast.success('Kategori berhasil ditambahkan!');
+    const envelope = await res.json();
+    if (envelope.success && envelope.data) {
+      setData((prev) => [...prev, envelope.data]);
+      setOpenForm(false);
+      toast.success('Kategori berhasil ditambahkan!');
+    } else {
+      toast.error(envelope.error || 'Gagal menambah kategori');
+    }
   };
 
   const updateCategory = async (form: CategoryRow) => {
@@ -78,12 +80,14 @@ export default function DataTableClient({ rows }: { rows: CategoryRow[] }) {
 
     if (!res.ok) return toast.error('Gagal mengubah kategori');
 
-    const updated: CategoryRow = await res.json();
-
-    setData((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-
-    setOpenForm(false);
-    toast.success('Kategori berhasil diperbarui!');
+    const envelope = await res.json();
+    if (envelope.success && envelope.data) {
+      setData((prev) => prev.map((x) => (x.id === envelope.data.id ? envelope.data : x)));
+      setOpenForm(false);
+      toast.success('Kategori berhasil diperbarui!');
+    } else {
+      toast.error(envelope.error || 'Gagal mengubah kategori');
+    }
   };
 
   const deleteCategory = async () => {
@@ -105,15 +109,15 @@ export default function DataTableClient({ rows }: { rows: CategoryRow[] }) {
   /* ---------------- RENDER ---------------- */
 
   return (
-    <div className="p-8 bg-gradient-to-br from-gray-50 to-purple-50 min-h-screen">
+    <div className="p-8 bg-linear-to-br from-gray-50 to-purple-50 min-h-screen">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center shadow-lg">
             <Tag className="text-white" size={24} />
           </div>
           <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-[#7D1972] to-[#b14fab] bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-[#7D1972] to-[#b14fab] bg-clip-text text-transparent">
               Kelola Kategori
             </h2>
             <p className="text-gray-600 text-sm">Manage product categories</p>
@@ -121,7 +125,7 @@ export default function DataTableClient({ rows }: { rows: CategoryRow[] }) {
         </div>
 
         <button
-          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 font-medium"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-[#7D1972] to-[#b14fab] text-white hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 font-medium"
           onClick={doAdd}
         >
           <Plus size={20} />
@@ -193,7 +197,7 @@ export default function DataTableClient({ rows }: { rows: CategoryRow[] }) {
             </button>
 
             <button
-              className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300"
+              className="px-6 py-2.5 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300"
               onClick={deleteCategory}
             >
               Hapus
@@ -230,7 +234,7 @@ function CategoryForm({
       onSubmit={handleSubmit}
     >
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center">
           <Tag className="text-white" size={24} />
         </div>
         <h2 className="text-2xl font-bold text-gray-800">
@@ -264,7 +268,7 @@ function CategoryForm({
         />
       </div>
 
-      <button className="py-3 rounded-xl bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300">
+      <button className="py-3 rounded-xl bg-linear-to-r from-[#7D1972] to-[#b14fab] text-white font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300">
         Simpan
       </button>
     </form>

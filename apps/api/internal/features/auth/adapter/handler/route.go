@@ -1,6 +1,10 @@
 package handler
 
-import "github.com/gofiber/fiber/v3"
+import (
+	"project-bamart2/apps/api/internal/shared/middleware"
+
+	"github.com/gofiber/fiber/v3"
+)
 
 // RegisterRoutes mounts all auth endpoints onto the given router group.
 // jwtMiddleware is injected so this file has no import on pkg/token directly.
@@ -20,4 +24,7 @@ func RegisterRoutes(router fiber.Router, h *AuthHandler, jwtMiddleware fiber.Han
 
 	// Users (protected - for admin dashboards)
 	router.Get("/users", jwtMiddleware, h.GetAllUsers)
+	router.Post("/users", jwtMiddleware, middleware.RequireRole("ADMIN"), h.CreateUser)
+	router.Put("/users/:id", jwtMiddleware, middleware.RequireRole("ADMIN"), h.UpdateUser)
+	router.Delete("/users/:id", jwtMiddleware, middleware.RequireRole("ADMIN"), h.DeleteUser)
 }

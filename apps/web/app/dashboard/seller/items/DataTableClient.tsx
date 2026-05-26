@@ -134,10 +134,14 @@ export default function SellerItemsTableClient({
 
     if (!res.ok) return toast.error('Gagal menambah item');
 
-    const newItem: ItemRow = await res.json();
-    setData((prev) => [...prev, newItem]);
-    setOpenForm(false);
-    toast.success('Item berhasil ditambahkan!');
+    const envelope = await res.json();
+    if (envelope.success && envelope.data) {
+      setData((prev) => [...prev, envelope.data]);
+      setOpenForm(false);
+      toast.success('Item berhasil ditambahkan!');
+    } else {
+      toast.error(envelope.error || 'Gagal menambah item');
+    }
   };
 
   const updateItem = async (form: ItemUpdateFormData) => {
@@ -149,11 +153,14 @@ export default function SellerItemsTableClient({
 
     if (!res.ok) return toast.error('Gagal mengubah item');
 
-    const updated: ItemRow = await res.json();
-
-    setData((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-    setOpenForm(false);
-    toast.success('Item berhasil diperbarui!');
+    const envelope = await res.json();
+    if (envelope.success && envelope.data) {
+      setData((prev) => prev.map((x) => (x.id === envelope.data.id ? envelope.data : x)));
+      setOpenForm(false);
+      toast.success('Item berhasil diperbarui!');
+    } else {
+      toast.error(envelope.error || 'Gagal mengubah item');
+    }
   };
 
   const deleteItem = async () => {

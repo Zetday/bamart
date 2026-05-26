@@ -136,10 +136,14 @@ export default function ItemsTableClient({
 
     if (!res.ok) return toast.error('Gagal menambah item');
 
-    const newItem = await res.json();
-    setData((prev) => [...prev, newItem]);
-    setOpenForm(false);
-    toast.success('Item berhasil ditambahkan!');
+    const envelope = await res.json();
+    if (envelope.success && envelope.data) {
+      setData((prev) => [...prev, envelope.data]);
+      setOpenForm(false);
+      toast.success('Item berhasil ditambahkan!');
+    } else {
+      toast.error(envelope.error || 'Gagal menambah item');
+    }
   };
 
   const updateItem = async (item: ItemUpdateInput) => {
@@ -151,10 +155,14 @@ export default function ItemsTableClient({
 
     if (!res.ok) return toast.error('Gagal mengubah item');
 
-    const updated = await res.json();
-    setData((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-    setOpenForm(false);
-    toast.success('Item berhasil diperbarui!');
+    const envelope = await res.json();
+    if (envelope.success && envelope.data) {
+      setData((prev) => prev.map((x) => (x.id === envelope.data.id ? envelope.data : x)));
+      setOpenForm(false);
+      toast.success('Item berhasil diperbarui!');
+    } else {
+      toast.error(envelope.error || 'Gagal mengubah item');
+    }
   };
 
   const deleteItem = async () => {
@@ -169,15 +177,15 @@ export default function ItemsTableClient({
   };
 
   return (
-    <div className="p-8 bg-gradient-to-br from-gray-50 to-purple-50 min-h-screen">
+    <div className="p-8 bg-linear-to-br from-gray-50 to-purple-50 min-h-screen">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center shadow-lg">
             <Package className="text-white" size={24} />
           </div>
           <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-[#7D1972] to-[#b14fab] bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-[#7D1972] to-[#b14fab] bg-clip-text text-transparent">
               Daftar Item
             </h2>
             <p className="text-gray-600 text-sm">Manage all products</p>
@@ -186,7 +194,7 @@ export default function ItemsTableClient({
 
         <button
           onClick={doAdd}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white hover:shadow-lg hover:scale-105 transition-all"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-[#7D1972] to-[#b14fab] text-white hover:shadow-lg hover:scale-105 transition-all"
         >
           <Plus size={20} />
           Tambah Item

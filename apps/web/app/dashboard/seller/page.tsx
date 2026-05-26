@@ -2,26 +2,25 @@ import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import SellerDashboardContent from '@/components/SellerDashboardContent';
+import { redirect } from 'next/navigation';
 
-export default async function SellerItemsPage() {
+export default async function SellerDashboardPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
-  if (!token) return <div>Unauthorized</div>;
+  if (!token) redirect('/login');
 
   const user = verifyToken(token);
-  if (!user) return <div>Unauthorized</div>;
-
+  if (!user) redirect('/login');
 
   return (
-    <div className="flex min-h-screen">
-      {/* SIDEBAR SELLER */}
-      <DashboardSidebar role="SELLER" />
-
-      {/* CONTENT */}
-      <div className="flex-1 p-6">
-        <SellerDashboardContent />
-      </div>
+    <div className="flex min-h-screen bg-slate-950">
+      <DashboardSidebar
+        role="SELLER"
+        userName={user.name}
+        userEmail={user.email}
+      />
+      <SellerDashboardContent />
     </div>
   );
 }

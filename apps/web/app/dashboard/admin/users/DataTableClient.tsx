@@ -5,6 +5,7 @@ import DataTable from '@/components/DataTable';
 import ActionButtons from '@/components/ActionButtons';
 import Modal from '@/components/Modal';
 import { Plus, Users, Trash2, UserCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface UserRow {
   id: number;
@@ -34,31 +35,81 @@ export default function DataTableClient({ rows }: { rows: UserRow[] }) {
     setOpenDelete(true);
   };
 
-  const addUser = (u: UserRow) => {
-    setData((prev) => [...prev, u]);
-    setOpenForm(false);
+  const addUser = async (u: UserRow) => {
+    const res = await fetch('/api/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: u.name,
+        email: u.email,
+        role: u.role,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) return toast.error('Gagal menambah user');
+
+    const envelope = await res.json();
+    if (envelope.success && envelope.data) {
+      setData((prev) => [...prev, envelope.data]);
+      setOpenForm(false);
+      toast.success('User berhasil ditambahkan!');
+    } else {
+      toast.error(envelope.error || 'Gagal menambah user');
+    }
   };
 
-  const updateUser = (u: UserRow) => {
-    setData((prev) => prev.map((x) => (x.id === u.id ? u : x)));
-    setOpenForm(false);
+  const updateUser = async (u: UserRow) => {
+    const res = await fetch(`/api/users/${u.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        name: u.name,
+        email: u.email,
+        role: u.role,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) return toast.error('Gagal mengubah user');
+
+    const envelope = await res.json();
+    if (envelope.success && envelope.data) {
+      setData((prev) => prev.map((x) => (x.id === envelope.data.id ? envelope.data : x)));
+      setOpenForm(false);
+      toast.success('User berhasil diperbarui!');
+    } else {
+      toast.error(envelope.error || 'Gagal mengubah user');
+    }
   };
 
-  const deleteUser = () => {
-    if (selected) setData((prev) => prev.filter((x) => x.id !== selected.id));
-    setOpenDelete(false);
+  const deleteUser = async () => {
+    if (!selected) return;
+
+    const res = await fetch(`/api/users/${selected.id}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) return toast.error('Gagal menghapus user');
+
+    const envelope = await res.json();
+    if (envelope.success) {
+      setData((prev) => prev.filter((x) => x.id !== selected.id));
+      setOpenDelete(false);
+      toast.success('User berhasil dihapus!');
+    } else {
+      toast.error(envelope.error || 'Gagal menghapus user');
+    }
   };
 
   return (
-    <div className="p-8 bg-gradient-to-br from-gray-50 to-purple-50 min-h-screen">
+    <div className="p-8 bg-linear-to-br from-gray-50 to-purple-50 min-h-screen">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
             <Users className="text-white" size={24} />
           </div>
           <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Daftar User
             </h2>
             <p className="text-gray-600 text-sm">Manage system users</p>
@@ -67,7 +118,7 @@ export default function DataTableClient({ rows }: { rows: UserRow[] }) {
 
         <button
           onClick={doAdd}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 font-medium"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-[#7D1972] to-[#b14fab] text-white hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 font-medium"
         >
           <Plus size={20} />
           Tambah User

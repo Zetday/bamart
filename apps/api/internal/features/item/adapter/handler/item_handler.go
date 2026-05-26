@@ -57,14 +57,20 @@ func (h *ItemHandler) Create(c fiber.Ctx) error {
 		return response.BadRequest(c, "Invalid request body")
 	}
 
-	// Always take userID from JWT context — never trust request body for ownership
+	// Always take userID from JWT context unless ADMIN override is active
 	userID := middleware.GetUserID(c)
 	if userID == 0 {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 
+	userRole := middleware.GetUserRole(c)
+	targetUserID := userID
+	if userRole == "ADMIN" && req.UserID != 0 {
+		targetUserID = req.UserID
+	}
+
 	item, err := h.uc.Create(usecase.CreateItemInput{
-		UserID:      userID,
+		UserID:      targetUserID,
 		CategoryID:  req.CategoryID,
 		Name:        req.Name,
 		Description: req.Description,
@@ -91,14 +97,32 @@ func (h *ItemHandler) Update(c fiber.Ctx) error {
 		return response.BadRequest(c, "Invalid request body")
 	}
 
-	// Always take userID from JWT context
 	userID := middleware.GetUserID(c)
 	if userID == 0 {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 
+	existingItem, err := h.uc.GetByID(uint(id))
+	if err != nil {
+		return response.FromAppError(c, err)
+	}
+
+	userRole := middleware.GetUserRole(c)
+	if userRole != "ADMIN" && existingItem.UserID != userID {
+		return response.Forbidden(c)
+	}
+
+	targetUserID := userID
+	if userRole == "ADMIN" {
+		if req.UserID != 0 {
+			targetUserID = req.UserID
+		} else {
+			targetUserID = existingItem.UserID
+		}
+	}
+
 	item, err := h.uc.Update(uint(id), usecase.UpdateItemInput{
-		UserID:      userID,
+		UserID:      targetUserID,
 		CategoryID:  req.CategoryID,
 		Name:        req.Name,
 		Description: req.Description,
@@ -118,6 +142,21 @@ func (h *ItemHandler) Delete(c fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
 		return response.BadRequest(c, "Invalid ID format")
+	}
+
+	userID := middleware.GetUserID(c)
+	if userID == 0 {
+		return response.Unauthorized(c, "Unauthorized")
+	}
+
+	existingItem, err := h.uc.GetByID(uint(id))
+	if err != nil {
+		return response.FromAppError(c, err)
+	}
+
+	userRole := middleware.GetUserRole(c)
+	if userRole != "ADMIN" && existingItem.UserID != userID {
+		return response.Forbidden(c)
 	}
 
 	if err := h.uc.Delete(uint(id)); err != nil {

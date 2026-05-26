@@ -10,4 +10,6 @@ type UserRepository interface {
 	FindByID(id uint) (*domain.User, error)
 	FindByRole(role string) ([]domain.User, error)
 	FindAll() ([]domain.User, error)
+	Update(user *domain.User) error
+	Delete(id uint) error
 }

@@ -9,42 +9,27 @@ import {
   ShoppingCart,
   LogOut,
   Tag,
-  Loader2,
+  ChevronRight,
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 interface SidebarProps {
   role: 'ADMIN' | 'SELLER';
+  userName?: string;
+  userEmail?: string;
 }
 
-/* ======================= SPINNER OVERLAY ======================= */
-function SidebarLoading() {
-  return (
-    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3 text-white">
-        <Loader2 className="w-8 h-8 animate-spin" />
-        <span className="text-sm tracking-wide">Memuat halaman…</span>
-      </div>
-    </div>
-  );
-}
-
-export default function DashboardSidebar({ role }: SidebarProps) {
+export default function DashboardSidebar({ role, userName, userEmail }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
-  function isActive(path: string) {
-    return pathname === path;
-  }
+  const isActive = (path: string) => pathname === path;
 
   const navigate = (path: string) => {
-    startTransition(() => {
-      router.push(path);
-    });
+    startTransition(() => router.push(path));
   };
 
-  /* ======================= LOGOUT ======================= */
   const handleLogout = async () => {
     const result = await Swal.fire({
       title: 'Konfirmasi Logout',
@@ -53,184 +38,127 @@ export default function DashboardSidebar({ role }: SidebarProps) {
       showCancelButton: true,
       confirmButtonText: 'Ya, Logout',
       cancelButtonText: 'Batal',
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#6b7280',
+      confirmButtonColor: '#7D1972',
+      cancelButtonColor: '#64748b',
       reverseButtons: true,
     });
 
     if (!result.isConfirmed) return;
 
     try {
-      const res = await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (!res.ok) {
-        throw new Error('Logout failed');
-      }
+      const res = await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      if (!res.ok) throw new Error('Logout failed');
 
       await Swal.fire({
         icon: 'success',
         title: 'Berhasil Logout',
-        text: 'Anda telah keluar dari akun.',
-        timer: 1500,
+        timer: 1200,
         showConfirmButton: false,
       });
 
       window.location.href = '/items';
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Gagal Logout',
-        text: 'Terjadi kesalahan. Silakan coba lagi.',
-      });
+    } catch {
+      Swal.fire({ icon: 'error', title: 'Gagal Logout', text: 'Silakan coba lagi.' });
     }
   };
 
-  return (
-    <aside className="w-64 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 shadow-2xl border-r border-gray-700 hidden md:flex flex-col relative overflow-hidden">
-      {/* Loading Overlay */}
-      {isPending && <SidebarLoading />}
+  const adminLinks = [
+    { label: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/dashboard/admin' },
+    { label: 'Kelola User', icon: <Users size={18} />, path: '/dashboard/admin/users' },
+    { label: 'Kelola Item', icon: <Package size={18} />, path: '/dashboard/admin/items' },
+    { label: 'Kelola Order', icon: <ShoppingCart size={18} />, path: '/dashboard/admin/orders' },
+    { label: 'Kelola Kategori', icon: <Tag size={18} />, path: '/dashboard/admin/categories' },
+  ];
 
-      {/* Header */}
-      <div className="px-6 py-8 border-b border-gray-700 relative z-10">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7D1972] to-[#b14fab] flex items-center justify-center shadow-lg">
-            <LayoutDashboard size={20} className="text-white" />
+  const sellerLinks = [
+    { label: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/dashboard/seller' },
+    { label: 'Kelola Item', icon: <Package size={18} />, path: '/dashboard/seller/items' },
+    { label: 'Lihat Order', icon: <ShoppingCart size={18} />, path: '/dashboard/seller/orders' },
+  ];
+
+  const links = role === 'ADMIN' ? adminLinks : sellerLinks;
+
+  const initials = userName
+    ? userName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+    : role[0];
+
+  return (
+    <aside className="w-60 shrink-0 bg-slate-950 flex-col min-h-screen hidden md:flex border-r border-slate-800">
+      {/* Brand */}
+      <div className="px-5 pt-7 pb-6 border-b border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#7D1972] flex items-center justify-center shrink-0">
+            <LayoutDashboard size={16} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-wide">
+            <p className="text-white font-semibold text-sm leading-tight tracking-wide">Bamart</p>
+            <p className="text-slate-500 text-[11px] mt-0.5">
               {role === 'ADMIN' ? 'Admin Panel' : 'Seller Panel'}
-            </h1>
-            <p className="text-xs text-gray-400">Dashboard Management</p>
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Menu */}
-      <nav className="flex-1 p-4 space-y-2 relative z-10">
-        <SidebarButton
-          disabled={isPending}
-          active={isActive(
-            role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/seller'
-          )}
-          label="Dashboard"
-          icon={<LayoutDashboard size={20} />}
-          onClick={() =>
-            navigate(
-              role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/seller'
-            )
-          }
-        />
-
-        {role === 'ADMIN' && (
-          <SidebarButton
-            disabled={isPending}
-            active={isActive('/dashboard/admin/users')}
-            label="Kelola User"
-            icon={<Users size={20} />}
-            onClick={() => navigate('/dashboard/admin/users')}
-          />
-        )}
-
-        <SidebarButton
-          disabled={isPending}
-          active={isActive(
-            role === 'ADMIN'
-              ? '/dashboard/admin/items'
-              : '/dashboard/seller/items'
-          )}
-          label="Kelola Item"
-          icon={<Package size={20} />}
-          onClick={() =>
-            navigate(
-              role === 'ADMIN'
-                ? '/dashboard/admin/items'
-                : '/dashboard/seller/items'
-            )
-          }
-        />
-
-        <SidebarButton
-          disabled={isPending}
-          active={isActive(
-            role === 'ADMIN'
-              ? '/dashboard/admin/orders'
-              : '/dashboard/seller/orders'
-          )}
-          label={role === 'ADMIN' ? 'Kelola Order' : 'Lihat Order'}
-          icon={<ShoppingCart size={20} />}
-          onClick={() =>
-            navigate(
-              role === 'ADMIN'
-                ? '/dashboard/admin/orders'
-                : '/dashboard/seller/orders'
-            )
-          }
-        />
-
-        {role === 'ADMIN' && (
-          <SidebarButton
-            disabled={isPending}
-            active={isActive('/dashboard/admin/categories')}
-            label="Kelola Kategori"
-            icon={<Tag size={20} />}
-            onClick={() => navigate('/dashboard/admin/categories')}
-          />
-        )}
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-5 space-y-0.5">
+        <p className="text-slate-600 text-[10px] font-semibold uppercase tracking-widest px-3 mb-3">
+          Menu
+        </p>
+        {links.map((link) => {
+          const active = isActive(link.path);
+          return (
+            <button
+              key={link.path}
+              disabled={isPending}
+              onClick={() => navigate(link.path)}
+              className={`
+                group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                transition-all duration-150 text-left relative
+                disabled:opacity-40 disabled:pointer-events-none
+                ${active
+                  ? 'bg-[#7D1972]/20 text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }
+              `}
+            >
+              {/* Active indicator */}
+              {active && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#7D1972] rounded-r-full" />
+              )}
+              <span className={active ? 'text-[#c96ec4]' : 'text-slate-500 group-hover:text-slate-300'}>
+                {link.icon}
+              </span>
+              {link.label}
+              {active && <ChevronRight size={14} className="ml-auto text-[#c96ec4]" />}
+            </button>
+          );
+        })}
       </nav>
 
-      {/* Logout */}
-      <div className="p-4 border-t border-gray-700 relative z-10">
+      {/* User / Logout */}
+      <div className="px-3 pb-5 border-t border-slate-800 pt-4 space-y-3">
+        {/* Avatar row */}
+        <div className="flex items-center gap-3 px-3">
+          <div className="w-8 h-8 rounded-full bg-[#7D1972] flex items-center justify-center text-white text-xs font-bold shrink-0">
+            {initials}
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-white text-xs font-medium truncate">{userName ?? role}</p>
+            <p className="text-slate-500 text-[10px] truncate">{userEmail ?? ''}</p>
+          </div>
+        </div>
+
         <button
           disabled={isPending}
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 w-full rounded-xl 
-            bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 
-            font-medium transition-all duration-300 shadow-lg
-            disabled:opacity-60 disabled:pointer-events-none"
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium
+            text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-150
+            disabled:opacity-40 disabled:pointer-events-none"
         >
-          <LogOut size={20} />
+          <LogOut size={16} />
           Logout
         </button>
       </div>
     </aside>
-  );
-}
-
-/* ======================= SIDEBAR BUTTON ======================= */
-function SidebarButton({
-  active,
-  label,
-  icon,
-  onClick,
-  disabled,
-}: {
-  active: boolean;
-  label: string;
-  icon: React.ReactNode;
-  onClick: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl text-left transition-all duration-300 group
-        ${
-          active
-            ? 'bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white shadow-lg scale-105'
-            : 'text-gray-300 hover:bg-gray-800/50 hover:text-white hover:translate-x-1'
-        }
-        disabled:opacity-50 disabled:pointer-events-none
-      `}
-    >
-      {icon}
-      <span className="font-medium">{label}</span>
-      {active && (
-        <div className="ml-auto w-2 h-2 rounded-full bg-white animate-pulse"></div>
-      )}
-    </button>
   );
 }

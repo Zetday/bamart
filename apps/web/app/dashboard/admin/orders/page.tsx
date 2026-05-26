@@ -1,6 +1,8 @@
 import { cookies } from 'next/headers';
+import { verifyToken } from '@/lib/auth';
 import OrdersTableClient from './DataTableClient';
 import DashboardSidebar from '@/components/DashboardSidebar';
+import { redirect } from 'next/navigation';
 
 interface AdminOrder {
   id: number;
@@ -19,6 +21,9 @@ interface AdminOrder {
 export default async function AdminOrdersPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
+  if (!token) redirect('/login');
+  const user = verifyToken(token);
+  if (!user) redirect('/login');
 
   const apiBaseUrl = process.env.API_URL || 'http://localhost:8080';
   const [ordersRes, buyersRes] = await Promise.all([
@@ -63,9 +68,9 @@ export default async function AdminOrdersPage() {
   }));
 
   return (
-    <div className="flex min-h-screen">
-      <DashboardSidebar role="ADMIN" />
-      <div className="flex-1 p-6">
+    <div className="flex min-h-screen bg-slate-950">
+      <DashboardSidebar role="ADMIN" userName={user.name} userEmail={user.email} />
+      <div className="flex-1 bg-slate-50 p-6">
         <OrdersTableClient rows={rows} buyers={buyers} />
       </div>
     </div>

@@ -1,7 +1,8 @@
 import DashboardSidebar from '@/components/DashboardSidebar';
 import OrdersSellerClient from './DataTableClient';
-import { cookies as getCookies} from 'next/headers';
+import { cookies as getCookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 interface SellerOrderItem {
   itemId: number;
@@ -30,11 +31,10 @@ export default async function SellerOrdersPage() {
   const token = cookieStore.get('token')?.value;
   const user = token ? verifyToken(token) : null;
 
-  if (!user || user.role !== 'SELLER') {
-    return <div>Akses ditolak</div>;
-  }
+  if (!user || user.role !== 'SELLER') redirect('/login');
 
-  const sellerId = user.id;
+  const authedUser = user!;
+  const sellerId = authedUser.id;
 
   const apiBaseUrl = process.env.API_URL || 'http://localhost:8080';
   const ordersRes = await fetch(`${apiBaseUrl}/api/orders`, {
@@ -69,9 +69,9 @@ export default async function SellerOrdersPage() {
   }));
 
   return (
-    <div className="flex min-h-screen">
-      <DashboardSidebar role="SELLER" />
-      <div className="flex-1 p-6">
+    <div className="flex min-h-screen bg-slate-950">
+      <DashboardSidebar role="SELLER" userName={authedUser.name} userEmail={authedUser.email} />
+      <div className="flex-1 bg-slate-50 p-6">
         <OrdersSellerClient rows={rows} />
       </div>
     </div>
