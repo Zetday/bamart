@@ -37,7 +37,13 @@ export default function LoginPage() {
       return;
     }
 
-    const user = data.user;
+    const user = data.data || data.user;
+
+    if (!user) {
+      setError('Data user tidak ditemukan dalam respons login');
+      setLoading(false);
+      return;
+    }
 
     if (user.role === 'ADMIN') {
       toast.success('Selamat datang Admin!');

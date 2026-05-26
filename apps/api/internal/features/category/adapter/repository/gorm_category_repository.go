@@ -48,6 +48,7 @@ type gormCategoryRepository struct {
 var _ port.CategoryRepository = (*gormCategoryRepository)(nil)
 
 func New(db *gorm.DB) port.CategoryRepository {
+	db.AutoMigrate(&categoryRecord{})
 	return &gormCategoryRepository{db: db}
 }
 

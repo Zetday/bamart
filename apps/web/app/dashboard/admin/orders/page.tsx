@@ -1,23 +1,58 @@
-import prisma from '@/lib/prisma';
+import { cookies } from 'next/headers';
 import OrdersTableClient from './DataTableClient';
 import DashboardSidebar from '@/components/DashboardSidebar';
 
+interface AdminOrder {
+  id: number;
+  userId: number;
+  totalPrice: number;
+  status: string;
+  orderDate: string;
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  notes?: string | null;
+}
+
 export default async function AdminOrdersPage() {
-  const orders = await prisma.order.findMany({
-    include: {
-      user: true,
-      items: { include: { item: true } },
-    },
-    orderBy: { id: 'desc' },
-  });
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+
+  const apiBaseUrl = process.env.API_URL || 'http://localhost:8080';
+  const [ordersRes, buyersRes] = await Promise.all([
+    fetch(`${apiBaseUrl}/api/orders`, {
+      headers: { Cookie: `token=${token}` },
+      cache: 'no-store',
+    }),
+    fetch(`${apiBaseUrl}/api/users?role=BUYER`, {
+      headers: { Cookie: `token=${token}` },
+      cache: 'no-store',
+    }),
+  ]);
+
+  const ordersEnvelope = await ordersRes.json();
+  const orders: AdminOrder[] = Array.isArray(ordersEnvelope.data)
+    ? ordersEnvelope.data
+    : Array.isArray(ordersEnvelope)
+    ? ordersEnvelope
+    : [];
+
+  const buyersEnvelope = await buyersRes.json();
+  const buyers = Array.isArray(buyersEnvelope.data)
+    ? buyersEnvelope.data
+    : Array.isArray(buyersEnvelope)
+    ? buyersEnvelope
+    : [];
 
   const rows = orders.map((o) => ({
     id: o.id,
-    buyer: o.user.name,
+    buyer: o.fullName,
     buyerId: o.userId,
     totalPrice: o.totalPrice,
     status: o.status,
-    date: o.orderDate.toISOString(),
+    date: new Date(o.orderDate).toISOString(),
 
     fullName: o.fullName,
     phone: o.phone,
@@ -26,11 +61,6 @@ export default async function AdminOrdersPage() {
     postalCode: o.postalCode,
     notes: o.notes ?? '',
   }));
-
-  const buyers = await prisma.user.findMany({
-    where: { role: 'BUYER' },
-    select: { id: true, name: true },
-  });
 
   return (
     <div className="flex min-h-screen">

@@ -48,9 +48,10 @@ type orderItemRecord struct {
 func (orderItemRecord) TableName() string { return "order_items" }
 
 type itemMinimal struct {
-	ID    uint
-	Name  string
-	Price int
+	ID     uint
+	Name   string
+	Price  int
+	UserID uint
 }
 
 func (itemMinimal) TableName() string { return "items" }
@@ -106,6 +107,7 @@ func toDomainOrderItem(r *orderItemRecord) *domain.OrderItem {
 		ItemName: r.Item.Name,
 		Quantity: r.Quantity,
 		Subtotal: r.Subtotal,
+		SellerID: r.Item.UserID,
 	}
 }
 
@@ -118,6 +120,7 @@ type gormOrderRepository struct {
 var _ port.OrderRepository = (*gormOrderRepository)(nil)
 
 func New(db *gorm.DB) port.OrderRepository {
+	db.AutoMigrate(&orderRecord{}, &orderItemRecord{})
 	return &gormOrderRepository{db: db}
 }
 

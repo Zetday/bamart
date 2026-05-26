@@ -95,6 +95,7 @@ type gormItemRepository struct {
 var _ port.ItemRepository = (*gormItemRepository)(nil)
 
 func New(db *gorm.DB) port.ItemRepository {
+	db.AutoMigrate(&itemRecord{})
 	return &gormItemRepository{db: db}
 }
 
@@ -121,7 +122,13 @@ func (r *gormItemRepository) FindByID(id uint) (*domain.Item, error) {
 		return nil, err
 	}
 
-	return toDomain(&rec), nil
+	dom := toDomain(&rec)
+
+	var totalSold int64
+	r.db.Table("order_items").Where("item_id = ?", id).Select("COALESCE(SUM(quantity), 0)").Row().Scan(&totalSold)
+	dom.Sold = int(totalSold)
+
+	return dom, nil
 }
 
 func (r *gormItemRepository) Update(item *domain.Item) error {

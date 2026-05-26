@@ -187,3 +187,88 @@ func (h *OrderHandler) GetOrderSummary(c fiber.Ctx) error {
 
 	return response.OK(c, "", fiber.Map{"total": total})
 }
+
+func (h *OrderHandler) GetMyOrdersCompat(c fiber.Ctx) error {
+	userID := middleware.GetUserID(c)
+	if userID == 0 {
+		return response.Unauthorized(c, "Unauthorized")
+	}
+
+	orders, err := h.uc.GetUserOrders(userID)
+	if err != nil {
+		return response.InternalError(c)
+	}
+
+	return c.JSON(fiber.Map{
+		"orders": FromDomainList(orders),
+	})
+}
+
+func (h *OrderHandler) GetUserOrderDetailCompat(c fiber.Ctx) error {
+	userID := middleware.GetUserID(c)
+	if userID == 0 {
+		return response.Unauthorized(c, "Unauthorized")
+	}
+
+	orderIDParam := c.Query("orderId")
+	orderIDInt, err := strconv.ParseUint(orderIDParam, 10, 32)
+	if err != nil || orderIDInt == 0 {
+		return response.BadRequest(c, "Invalid orderId query parameter")
+	}
+
+	order, err := h.uc.GetUserOrderDetail(uint(orderIDInt), userID)
+	if err != nil {
+		return response.FromAppError(c, err)
+	}
+
+	return c.JSON(fiber.Map{
+		"order": FromDomain(order),
+	})
+}
+
+func (h *OrderHandler) GetOrderSummaryCompat(c fiber.Ctx) error {
+	userID := middleware.GetUserID(c)
+	if userID == 0 {
+		return response.Unauthorized(c, "Unauthorized")
+	}
+
+	orderIDParam := c.Query("orderId")
+	orderIDInt, err := strconv.ParseUint(orderIDParam, 10, 32)
+	if err != nil || orderIDInt == 0 {
+		return response.BadRequest(c, "Invalid orderId query parameter")
+	}
+
+	total, err := h.uc.GetOrderSummary(uint(orderIDInt), userID)
+	if err != nil {
+		return response.FromAppError(c, err)
+	}
+
+	return c.JSON(fiber.Map{
+		"total": total,
+	})
+}
+
+func (h *OrderHandler) PayOrderCompat(c fiber.Ctx) error {
+	userID := middleware.GetUserID(c)
+	if userID == 0 {
+		return response.Unauthorized(c, "Unauthorized")
+	}
+
+	var req PayOrderRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return response.BadRequest(c, "Invalid body")
+	}
+
+	if req.OrderID == 0 {
+		return response.BadRequest(c, "Missing orderId in body")
+	}
+
+	redirect, err := h.uc.PayOrder(req.OrderID, userID)
+	if err != nil {
+		return response.FromAppError(c, err)
+	}
+
+	return c.JSON(fiber.Map{
+		"redirect": redirect,
+	})
+}

@@ -1,6 +1,5 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import prisma from '@/lib/prisma';
 
 /* -------------------------------------------
    Custom interface untuk CookieStore Next.js
@@ -19,6 +18,7 @@ interface CookieStore {
 export interface TokenPayload extends JwtPayload {
   id: number;
   email: string;
+  name: string;
   role: 'ADMIN' | 'SELLER' | 'BUYER';
 }
 
@@ -45,12 +45,12 @@ export async function getUser() {
   const decoded = verifyToken(token);
   if (!decoded) return null;
 
-  const user = await prisma.user.findUnique({
-    where: { id: decoded.id },
-    select: { id: true, name: true, email: true, role: true },
-  });
-
-  return user;
+  return {
+    id: decoded.id,
+    name: decoded.name || 'User',
+    email: decoded.email,
+    role: decoded.role,
+  };
 }
 
 /* -------------------------------------------

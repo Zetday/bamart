@@ -59,6 +59,7 @@ type gormUserRepository struct {
 var _ port.UserRepository = (*gormUserRepository)(nil)
 
 func New(db *gorm.DB) port.UserRepository {
+	db.AutoMigrate(&userRecord{})
 	return &gormUserRepository{db: db}
 }
 
@@ -100,3 +101,17 @@ func (r *gormUserRepository) FindByRole(role string) ([]domain.User, error) {
 	}
 	return users, nil
 }
+
+func (r *gormUserRepository) FindAll() ([]domain.User, error) {
+	var records []userRecord
+	if err := r.db.Order("id desc").Find(&records).Error; err != nil {
+		return nil, err
+	}
+	
+	var users []domain.User
+	for _, rec := range records {
+		users = append(users, *toDomain(&rec))
+	}
+	return users, nil
+}
+

@@ -12,6 +12,17 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 
+interface Category {
+  id: number;
+  name: string;
+  description: string | null;
+}
+
+interface ItemMinimal {
+  id: number;
+  categoryId: number | null;
+}
+
 interface CategoryWithCount {
   id: number;
   name: string;
@@ -81,18 +92,20 @@ export default function ModernLandingPage() {
         const categoriesPromise = fetch('/api/categories').then(
           async (categoriesRes) => {
             const categoriesData = await categoriesRes.json();
+            const categoriesList = categoriesData.data || categoriesData || [];
 
-            if (categoriesRes.ok && Array.isArray(categoriesData)) {
+            if (categoriesRes.ok && Array.isArray(categoriesList)) {
               // Ambil items untuk menghitung produk per kategori
               const itemsRes = await fetch('/api/items');
-              const itemsData = await itemsRes.json();
+              const itemsDataEnvelope = await itemsRes.json();
+              const itemsData = itemsDataEnvelope.data || itemsDataEnvelope || [];
 
               if (Array.isArray(itemsData)) {
-                const categoriesWithCount = categoriesData.map((cat) => ({
+                const categoriesWithCount = categoriesList.map((cat: Category) => ({
                   ...cat,
                   _count: {
                     items: itemsData.filter(
-                      (item) => item.categoryId === cat.id
+                      (item: ItemMinimal) => item.categoryId === cat.id
                     ).length,
                   },
                 }));
@@ -105,8 +118,8 @@ export default function ModernLandingPage() {
                 setCategories(topCategories);
               } else {
                 setCategories(
-                  categoriesData
-                    .map((cat) => ({
+                  categoriesList
+                    .map((cat: Category) => ({
                       ...cat,
                       _count: { items: 0 },
                     }))
@@ -151,7 +164,7 @@ export default function ModernLandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-pink-50 overflow-hidden">
       {/* Hero Section */}
       <div className="relative">
         {/* Animated Background Elements */}
@@ -203,13 +216,13 @@ export default function ModernLandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
               <Link
                 href="/items"
-                className="group relative px-8 py-4 bg-gradient-to-r from-[#7D1972] to-purple-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                className="group relative px-8 py-4 bg-linear-to-r from-[#7D1972] to-purple-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   Mulai Belanja
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-linear-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
             </div>
 
@@ -226,7 +239,7 @@ export default function ModernLandingPage() {
                   { value: stats.totalCustomers, label: 'Customer' },
                 ].map((stat, i) => (
                   <div key={i} className="space-y-1">
-                    <div className="text-3xl md:text-4xl font-black bg-gradient-to-r from-[#7D1972] to-pink-600 bg-clip-text text-transparent">
+                    <div className="text-3xl md:text-4xl font-black bg-linear-to-r from-[#7D1972] to-pink-600 bg-clip-text text-transparent">
                       {stat.value}+
                     </div>
                     <div className="text-sm text-gray-600 font-medium">
@@ -248,7 +261,7 @@ export default function ModernLandingPage() {
               key={i}
               className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100"
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-[#7D1972] to-purple-600 rounded-2xl flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 bg-linear-to-br from-[#7D1972] to-purple-600 rounded-2xl flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">
@@ -283,7 +296,7 @@ export default function ModernLandingPage() {
               >
                 {/* Gradient Background on Hover */}
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${
+                  className={`absolute inset-0 bg-linear-to-br ${
                     categoryColors[i % categoryColors.length]
                   } opacity-0 group-hover:opacity-10 transition-opacity`}
                 />
@@ -316,7 +329,7 @@ export default function ModernLandingPage() {
 
       {/* CTA Section */}
       <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="relative bg-gradient-to-r from-[#7D1972] via-purple-600 to-pink-600 rounded-3xl p-12 md:p-16 overflow-hidden shadow-2xl">
+        <div className="relative bg-linear-to-r from-[#7D1972] via-purple-600 to-pink-600 rounded-3xl p-12 md:p-16 overflow-hidden shadow-2xl">
           {/* Decorative Elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32" />
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full -ml-48 -mb-48" />

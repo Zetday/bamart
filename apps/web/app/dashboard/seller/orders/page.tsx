@@ -1,8 +1,29 @@
-import prisma from '@/lib/prisma';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import OrdersSellerClient from './DataTableClient';
 import { cookies as getCookies} from 'next/headers';
 import { verifyToken } from '@/lib/auth';
+
+interface SellerOrderItem {
+  itemId: number;
+  sellerId: number;
+  quantity: number;
+  subtotal: number;
+}
+
+interface SellerOrder {
+  id: number;
+  userId: number;
+  totalPrice: number;
+  status: string;
+  orderDate: string;
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  notes?: string | null;
+  items: SellerOrderItem[];
+}
 
 export default async function SellerOrdersPage() {
   const cookieStore = await getCookies(); // ← TIDAK pakai await
@@ -15,28 +36,29 @@ export default async function SellerOrdersPage() {
 
   const sellerId = user.id;
 
-  const orders = await prisma.order.findMany({
-    where: {
-      items: {
-        some: {
-          item: { userId: sellerId },
-        },
-      },
-    },
-    include: {
-      user: true,
-      items: { include: { item: true } },
-    },
-    orderBy: { id: 'desc' },
+  const apiBaseUrl = process.env.API_URL || 'http://localhost:8080';
+  const ordersRes = await fetch(`${apiBaseUrl}/api/orders`, {
+    headers: { Cookie: `token=${token}` },
+    cache: 'no-store',
   });
+  const ordersEnvelope = await ordersRes.json();
+  const orders: SellerOrder[] = Array.isArray(ordersEnvelope.data)
+    ? ordersEnvelope.data
+    : Array.isArray(ordersEnvelope)
+    ? ordersEnvelope
+    : [];
 
-  const rows = orders.map((o) => ({
+  const sellerOrders = orders.filter((o) =>
+    o.items && o.items.some((it) => it.sellerId === sellerId)
+  );
+
+  const rows = sellerOrders.map((o) => ({
     id: o.id,
-    buyer: o.user.name,
+    buyer: o.fullName,
     buyerId: o.userId,
     totalPrice: o.totalPrice,
     status: o.status,
-    date: o.orderDate.toISOString(),
+    date: new Date(o.orderDate).toISOString(),
 
     fullName: o.fullName,
     phone: o.phone,

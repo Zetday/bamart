@@ -63,7 +63,12 @@ export default function Sidebar({
       try {
         const response = await fetch('/api/categories');
         const data = await response.json();
-        setCategories(data);
+        const catsList = Array.isArray(data.data)
+          ? data.data
+          : Array.isArray(data)
+          ? data
+          : [];
+        setCategories(catsList);
       } catch (error) {
         console.error('Error fetching categories:', error);
       } finally {
@@ -79,7 +84,12 @@ export default function Sidebar({
       try {
         const res = await fetch('/api/brands');
         const data = await res.json();
-        setBrands(data);
+        const brandsList = Array.isArray(data.data)
+          ? data.data
+          : Array.isArray(data)
+          ? data
+          : [];
+        setBrands(brandsList);
       } catch (err) {
         console.error('Error fetching brands', err);
       } finally {

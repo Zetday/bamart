@@ -9,4 +9,5 @@ type UserRepository interface {
 	FindByEmail(email string) (*domain.User, error)
 	FindByID(id uint) (*domain.User, error)
 	FindByRole(role string) ([]domain.User, error)
+	FindAll() ([]domain.User, error)
 }

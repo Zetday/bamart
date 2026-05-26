@@ -1,9 +1,7 @@
-import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import SellerDashboardContent from '@/components/SellerDashboardContent';
-import type { Item } from '@prisma/client';
 
 export default async function SellerItemsPage() {
   const cookieStore = await cookies();
@@ -14,10 +12,6 @@ export default async function SellerItemsPage() {
   const user = verifyToken(token);
   if (!user) return <div>Unauthorized</div>;
 
-  // Ambil hanya item milik seller login
-  const items: Item[] = await prisma.item.findMany({
-    where: { userId: user.id },
-  });
 
   return (
     <div className="flex min-h-screen">

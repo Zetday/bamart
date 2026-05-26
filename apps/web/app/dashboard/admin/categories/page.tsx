@@ -1,19 +1,22 @@
-import prisma from '@/lib/prisma';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import DataTableClient from './DataTableClient';
 
-export default async function AdminCategoriesPage() {
-  // Ambil seluruh kategori
-  const categories = await prisma.category.findMany({
-    orderBy: { name: 'asc' },
-    select: {
-      id: true,
-      name: true,
-      description: true, // ← WAJIB DITAMBAHKAN
-    },
-  });
+interface Category {
+  id: number;
+  name: string;
+  description: string | null;
+}
 
-  // Ubah menjadi rows untuk DataTable
+export default async function AdminCategoriesPage() {
+  const apiBaseUrl = process.env.API_URL || 'http://localhost:8080';
+  const categoriesRes = await fetch(`${apiBaseUrl}/api/categories`, { cache: 'no-store' });
+  const categoriesEnvelope = await categoriesRes.json();
+  const categories: Category[] = Array.isArray(categoriesEnvelope.data)
+    ? categoriesEnvelope.data
+    : Array.isArray(categoriesEnvelope)
+    ? categoriesEnvelope
+    : [];
+
   const rows = categories.map((c) => ({
     id: c.id,
     name: c.name,

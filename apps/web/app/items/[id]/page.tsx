@@ -1,4 +1,3 @@
-import prisma from '@/lib/prisma';
 import Image from 'next/image';
 import CheckoutBar from '@/components/Checkoutbar';
 import { notFound } from 'next/navigation';
@@ -11,6 +10,7 @@ type RelatedItem = {
   price: number;
   stock: number;
   imageUrl: string | null;
+  categoryId: number;
 };
 
 // === DETERMINISTIC HASH RANDOM (SAFE) ===
@@ -45,45 +45,27 @@ export default async function ItemDetailPage({
 
   if (isNaN(id) || id <= 0) return notFound();
 
-  const item = await prisma.item.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      price: true,
-      stock: true,
-      imageUrl: true,
-      description: true,
-      categoryId: true,
-      category: true,
-      user: true,
-    },
-  });
+  const apiBaseUrl = process.env.API_URL || 'http://localhost:8080';
+  const itemRes = await fetch(`${apiBaseUrl}/api/items/${id}`, { cache: 'no-store' });
+  if (!itemRes.ok) return notFound();
+  const itemEnvelope = await itemRes.json();
+  const item = itemEnvelope.data;
 
   if (!item) return notFound();
 
-  const [soldData, related] = await Promise.all([
-    prisma.orderItem.aggregate({
-      where: { itemId: id },
-      _sum: { quantity: true },
-    }),
-    prisma.item.findMany({
-      where: {
-        id: { not: id },
-        categoryId: item.categoryId ?? undefined,
-      },
-      take: 10,
-      select: {
-        id: true,
-        name: true,
-        price: true,
-        stock: true,
-        imageUrl: true,
-      },
-    }),
-  ]);
+  const allRes = await fetch(`${apiBaseUrl}/api/items`, { cache: 'no-store' });
+  const allEnvelope = await allRes.json();
+  const allItems: RelatedItem[] = Array.isArray(allEnvelope.data)
+    ? allEnvelope.data
+    : Array.isArray(allEnvelope)
+    ? allEnvelope
+    : [];
 
-  const totalSold = soldData._sum.quantity ?? 0;
+  const related = allItems
+    .filter((r) => r.id !== id && r.categoryId === item.categoryId)
+    .slice(0, 10);
+
+  const totalSold = item.sold ?? 0;
 
   const seed = hashNumber(String(item.id));
   const randomRating = 4 + (seed % 100) / 100;
@@ -92,14 +74,14 @@ export default async function ItemDetailPage({
 
   return (
     // ✅ PENTING: padding-bottom untuk mobile
-    <div className="relative w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 pt-12 pb-[96px] sm:pb-[120px] lg:pb-0">
+    <div className="relative w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 pt-12 pb-24 sm:pb-[120px] lg:pb-0">
       {/* GRID */}
       <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* ========== GALERI FOTO ========== */}
         <div className="flex gap-4">
           <div className="flex-1">
             <div
-              className="relative w-full h-[260px] sm:h-[320px] md:h-[380px] lg:h-[420px] 
+              className="relative w-full h-[260px] sm:h-80 md:h-[380px] lg:h-[420px] 
               bg-gray-300 rounded-xl overflow-hidden pt-10"
             >
               <Link
@@ -147,7 +129,7 @@ export default async function ItemDetailPage({
           <div className="border-t mt-4 pt-4 text-sm">
             <p className="font-semibold">Kategori:</p>
             <p className="text-gray-700 mb-4">
-              {item.category?.name || 'UMKM Product'}
+              {item.category || 'UMKM Product'}
             </p>
 
             <p className="font-semibold">Deskripsi:</p>
@@ -169,7 +151,7 @@ export default async function ItemDetailPage({
             <div className="w-8 h-8 rounded-full bg-gray-200"></div>
 
             <div className="leading-tight">
-              <h3 className="font-semibold text-sm">{item.user.name}</h3>
+              <h3 className="font-semibold text-sm">{item.seller || 'Seller'}</h3>
 
               <p className="text-yellow-500 text-xs">
                 ★ {randomRating.toFixed(1)} ({randomReviews})
@@ -198,8 +180,8 @@ export default async function ItemDetailPage({
           <Link
             key={r.id}
             href={`/items/${r.id}`}
-            className="min-w-[160px] sm:min-w-[180px] md:min-w-[200px] rounded-xl 
-            overflow-hidden border shadow-sm bg-white flex-shrink-0"
+            className="min-w-40 sm:min-w-[180px] md:min-w-[200px] rounded-xl 
+            overflow-hidden border shadow-sm bg-white shrink-0"
           >
             <div className="relative h-32 bg-gray-200">
               <Image

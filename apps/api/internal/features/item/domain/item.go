@@ -18,4 +18,5 @@ type Item struct {
 	// Optional relations loaded depending on context
 	SellerName   string
 	CategoryName string
+	Sold         int
 }

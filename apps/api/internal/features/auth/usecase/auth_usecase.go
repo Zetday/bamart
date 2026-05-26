@@ -34,6 +34,7 @@ type AuthUseCase interface {
 	Login(email, password string) (*LoginResult, error)
 	GetUserByID(id uint) (*domain.User, error)
 	GetBrands() ([]domain.User, error)
+	GetAllUsers(role string) ([]domain.User, error)
 }
 
 // ── Implementation ───────────────────────────────────────────────────────────
@@ -123,4 +124,11 @@ func (uc *authUseCase) GetUserByID(id uint) (*domain.User, error) {
 
 func (uc *authUseCase) GetBrands() ([]domain.User, error) {
 	return uc.userRepo.FindByRole("SELLER")
+}
+
+func (uc *authUseCase) GetAllUsers(role string) ([]domain.User, error) {
+	if role != "" {
+		return uc.userRepo.FindByRole(role)
+	}
+	return uc.userRepo.FindAll()
 }

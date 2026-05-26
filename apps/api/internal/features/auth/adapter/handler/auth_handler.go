@@ -124,3 +124,25 @@ func (h *AuthHandler) GetBrands(c fiber.Ctx) error {
 
 	return c.Status(200).JSON(res) // Match NextJS raw JSON array response
 }
+
+// GET /api/users
+func (h *AuthHandler) GetAllUsers(c fiber.Ctx) error {
+	role := c.Query("role")
+	users, err := h.uc.GetAllUsers(role)
+	if err != nil {
+		return response.InternalError(c)
+	}
+
+	res := make([]UserResponse, 0, len(users))
+	for _, u := range users {
+		res = append(res, UserResponse{
+			ID:    u.ID,
+			Name:  u.Name,
+			Email: u.Email,
+			Role:  string(u.Role),
+		})
+	}
+
+	return response.OK(c, "", res)
+}
+

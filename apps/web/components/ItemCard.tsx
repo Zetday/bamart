@@ -2,8 +2,18 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Item } from '@prisma/client';
 import { useState, useMemo } from 'react';
+
+export interface Item {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  imageUrl?: string | null;
+  description?: string | null;
+  categoryId?: number | null;
+  userId?: number;
+}
 
 interface ItemCardProps {
   item: Item;
@@ -67,7 +77,7 @@ export default function ItemCard({
         </div>
 
         {/* CONTENT */}
-        <div className="flex flex-col flex-grow">
+        <div className="flex flex-col grow">
           {/* BADGE */}
           <div className="mb-1.5 sm:mb-2">
             <span
@@ -79,7 +89,7 @@ export default function ItemCard({
           </div>
 
           {/* NAME */}
-          <h3 className="text-xs sm:text-sm md:text-base font-semibold text-gray-900 line-clamp-2 mb-1.5 sm:mb-2 flex-grow">
+          <h3 className="text-xs sm:text-sm md:text-base font-semibold text-gray-900 line-clamp-2 mb-1.5 sm:mb-2 grow">
             {item.name}
           </h3>
 
@@ -147,7 +157,7 @@ export default function ItemCard({
 
             <div
               className="w-full lg:w-auto text-center rounded-md sm:rounded-lg
-              min-h-[36px] sm:min-h-[40px]
+              min-h-9 sm:min-h-10
               px-3 sm:px-4 py-2
               text-xs sm:text-sm md:text-base
               font-medium whitespace-nowrap

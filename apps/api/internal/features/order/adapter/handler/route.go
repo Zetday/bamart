@@ -19,6 +19,13 @@ func RegisterRoutes(router fiber.Router, h *OrderHandler, jwtMiddleware fiber.Ha
 	orders.Put("/:id", h.Update)
 	orders.Delete("/:id", h.Delete)
 
-	// Next.js API compatibility
+	// Next.js API compatibility (singular order endpoint aliases)
+	orderGroup := router.Group("/order")
+	orderGroup.Use(jwtMiddleware)
+	orderGroup.Get("/list", h.GetMyOrdersCompat)
+	orderGroup.Get("/detail", h.GetUserOrderDetailCompat)
+	orderGroup.Get("/summary", h.GetOrderSummaryCompat)
+	orderGroup.Post("/pay", h.PayOrderCompat)
+
 	router.Post("/checkout", jwtMiddleware, h.Checkout)
 }

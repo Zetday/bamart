@@ -17,4 +17,7 @@ func RegisterRoutes(router fiber.Router, h *AuthHandler, jwtMiddleware fiber.Han
 
 	// Brands (public)
 	router.Get("/brands", h.GetBrands)
+
+	// Users (protected - for admin dashboards)
+	router.Get("/users", jwtMiddleware, h.GetAllUsers)
 }

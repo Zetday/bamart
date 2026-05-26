@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { IoSearchSharp } from 'react-icons/io5';
@@ -39,24 +40,23 @@ export default function Navbar() {
         const data = await res.json();
         setUser(data.user || null);
       } catch (err) {
-        console.error('Failed to fetch session:', err);
+        console.error('Failed to fetch user', err);
       }
     }
-
     getUser();
   }, []);
 
-  // Logout: hapus cookie token
+  // Handle logout
   const handleLogout = async () => {
     const result = await Swal.fire({
-      title: 'Konfirmasi Logout',
-      text: 'Apakah Anda yakin ingin logout?',
+      title: 'Apakah Anda yakin?',
+      text: 'Anda akan keluar dari akun ini!',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Ya, Logout',
+      confirmButtonColor: '#7D1972',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya, Logout!',
       cancelButtonText: 'Batal',
-      confirmButtonColor: '#dc2626', // merah
-      cancelButtonColor: '#6b7280', // abu
       reverseButtons: true,
     });
 
@@ -82,6 +82,7 @@ export default function Navbar() {
 
       window.location.href = '/items';
     } catch (error) {
+      console.error('Logout error:', error);
       Swal.fire({
         icon: 'error',
         title: 'Gagal Logout',
@@ -138,10 +139,13 @@ export default function Navbar() {
               href="/items"
               className="hidden md:flex mr-5 items-center shrink-0"
             >
-              <img
+              <Image
                 src="/logo/bamart-logo.svg"
                 alt="logo"
+                width={140}
+                height={40}
                 className="w-[110px] md:w-[140px] h-auto shrink-0"
+                priority
               />
             </Link>
 

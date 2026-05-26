@@ -37,9 +37,10 @@ type cartItemRecord struct {
 func (cartItemRecord) TableName() string { return "cart_items" }
 
 type itemMinimal struct {
-	ID    uint
-	Name  string
-	Price int
+	ID       uint
+	Name     string
+	Price    int
+	ImageUrl string
 }
 
 func (itemMinimal) TableName() string { return "items" }
@@ -59,13 +60,14 @@ func toDomainCart(r *cartRecord) *domain.Cart {
 
 func toDomainItem(r *cartItemRecord) *domain.CartItem {
 	return &domain.CartItem{
-		ID:        r.ID,
-		CartID:    r.CartID,
-		ItemID:    r.ItemID,
-		ItemName:  r.Item.Name,
-		ItemPrice: r.Item.Price,
-		Quantity:  r.Quantity,
-		Subtotal:  r.Subtotal,
+		ID:           r.ID,
+		CartID:       r.CartID,
+		ItemID:       r.ItemID,
+		ItemName:     r.Item.Name,
+		ItemPrice:    r.Item.Price,
+		ItemImageUrl: r.Item.ImageUrl,
+		Quantity:     r.Quantity,
+		Subtotal:     r.Subtotal,
 	}
 }
 
@@ -76,6 +78,7 @@ type gormCartRepository struct {
 var _ port.CartRepository = (*gormCartRepository)(nil)
 
 func New(db *gorm.DB) port.CartRepository {
+	db.AutoMigrate(&cartRecord{}, &cartItemRecord{})
 	return &gormCartRepository{db: db}
 }
 

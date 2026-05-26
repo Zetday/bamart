@@ -40,8 +40,13 @@ export default function ItemsPage() {
       try {
         const response = await fetch('/api/items');
         const data = await response.json();
-        setItems(data);
-        setFilteredItems(data);
+        const itemsList = Array.isArray(data.data)
+          ? data.data
+          : Array.isArray(data)
+          ? data
+          : [];
+        setItems(itemsList);
+        setFilteredItems(itemsList);
       } catch (error) {
         console.error('Error fetching items:', error);
       } finally {

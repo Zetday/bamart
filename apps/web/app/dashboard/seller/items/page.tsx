@@ -1,8 +1,20 @@
-import prisma from '@/lib/prisma';
 import { cookies as getCookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import SellerItemsTableClient from './DataTableClient';
 import DashboardSidebar from '@/components/DashboardSidebar';
+
+interface SellerItem {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  description: string | null;
+  imageUrl: string | null;
+  seller: string;
+  userId: number;
+  category: string | null;
+  categoryId: number | null;
+}
 
 export default async function SellerItemsPage() {
   const cookieStore = await getCookies(); // ← TIDAK pakai await
@@ -26,25 +38,37 @@ export default async function SellerItemsPage() {
 
   const sellerId = payload.id;
 
-  const categories = await prisma.category.findMany({
-    orderBy: { name: 'asc' },
-  });
+  const apiBaseUrl = process.env.API_URL || 'http://localhost:8080';
+  const [categoriesRes, itemsRes] = await Promise.all([
+    fetch(`${apiBaseUrl}/api/categories`, { cache: 'no-store' }),
+    fetch(`${apiBaseUrl}/api/items`, { cache: 'no-store' }),
+  ]);
 
-  const items = await prisma.item.findMany({
-    where: { userId: sellerId },
-    include: { category: true, user: true },
-    orderBy: { id: 'desc' },
-  });
+  const categoriesEnvelope = await categoriesRes.json();
+  const categories = Array.isArray(categoriesEnvelope.data)
+    ? categoriesEnvelope.data
+    : Array.isArray(categoriesEnvelope)
+    ? categoriesEnvelope
+    : [];
 
-  const rows = items.map((i) => ({
+  const itemsEnvelope = await itemsRes.json();
+  const items: SellerItem[] = Array.isArray(itemsEnvelope.data)
+    ? itemsEnvelope.data
+    : Array.isArray(itemsEnvelope)
+    ? itemsEnvelope
+    : [];
+
+  const sellerItems = items.filter((i) => i.userId === sellerId);
+
+  const rows = sellerItems.map((i) => ({
     id: i.id,
     name: i.name,
     price: i.price,
     stock: i.stock,
     description: i.description ?? '',
     imageUrl: i.imageUrl,
-    seller: i.user.name,
-    category: i.category?.name ?? null,
+    seller: i.seller,
+    category: i.category ?? null,
     categoryId: i.categoryId,
     userId: i.userId,
   }));

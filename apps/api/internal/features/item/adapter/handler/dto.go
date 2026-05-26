@@ -37,6 +37,7 @@ type ItemResponse struct {
 	CategoryID  *uint   `json:"categoryId"`
 	Seller      string  `json:"seller,omitempty"`
 	Category    string  `json:"category,omitempty"`
+	Sold        int     `json:"sold"`
 }
 
 func FromDomain(item *domain.Item) ItemResponse {
@@ -51,6 +52,7 @@ func FromDomain(item *domain.Item) ItemResponse {
 		CategoryID:  item.CategoryID,
 		Seller:      item.SellerName,
 		Category:    item.CategoryName,
+		Sold:        item.Sold,
 	}
 }
 

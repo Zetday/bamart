@@ -3,13 +3,14 @@ package domain
 import "time"
 
 type CartItem struct {
-	ID        uint
-	CartID    uint
-	ItemID    uint
-	ItemName  string
-	ItemPrice int
-	Quantity  int
-	Subtotal  int // Quantity * ItemPrice
+	ID           uint
+	CartID       uint
+	ItemID       uint
+	ItemName     string
+	ItemPrice    int
+	ItemImageUrl string
+	Quantity     int
+	Subtotal     int // Quantity * ItemPrice
 }
 
 type Cart struct {

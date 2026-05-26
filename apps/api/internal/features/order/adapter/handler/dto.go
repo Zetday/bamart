@@ -53,6 +53,7 @@ type OrderItemResponse struct {
 	ItemName string `json:"itemName"`
 	Quantity int    `json:"quantity"`
 	Subtotal int    `json:"subtotal"`
+	SellerID uint   `json:"sellerId"`
 }
 
 func FromDomain(o *domain.Order) OrderResponse {
@@ -77,6 +78,7 @@ func FromDomain(o *domain.Order) OrderResponse {
 			ItemName: it.ItemName,
 			Quantity: it.Quantity,
 			Subtotal: it.Subtotal,
+			SellerID: it.SellerID,
 		})
 	}
 	return res

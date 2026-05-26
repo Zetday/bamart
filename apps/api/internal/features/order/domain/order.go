@@ -9,6 +9,7 @@ type OrderItem struct {
 	ItemName string
 	Quantity int
 	Subtotal int
+	SellerID uint
 }
 
 type CartItemDTO struct {
