@@ -14,9 +14,9 @@ func RegisterRoutes(router fiber.Router, h *ItemHandler, jwtMiddleware fiber.Han
 	items.Get("/", h.GetAll)
 	items.Get("/:id", h.GetByID)
 
-	sellerOnly := items.Group("", jwtMiddleware, middleware.RequireRole(string(domain.RoleSeller)))
-	sellerOnly.Post("/upload", h.UploadImage)
-	sellerOnly.Post("/", h.Create)
-	sellerOnly.Put("/:id", h.Update)
-	sellerOnly.Delete("/:id", h.Delete)
+	sellerOrAdmin := items.Group("", jwtMiddleware, middleware.RequireRole(string(domain.RoleSeller), string(domain.RoleAdmin)))
+	sellerOrAdmin.Post("/upload", h.UploadImage)
+	sellerOrAdmin.Post("/", h.Create)
+	sellerOrAdmin.Put("/:id", h.Update)
+	sellerOrAdmin.Delete("/:id", h.Delete)
 }
