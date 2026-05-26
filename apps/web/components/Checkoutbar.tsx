@@ -38,6 +38,9 @@ export default function CheckoutBar({ item }: { item: Item }) {
 
       const res = await fetch('/api/cart/add', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           itemId: item.id,
           quantity: qty,
@@ -74,6 +77,9 @@ export default function CheckoutBar({ item }: { item: Item }) {
 
       const res = await fetch('/api/cart/add', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           itemId: item.id,
           quantity: qty,
