@@ -37,10 +37,15 @@ export default function Navbar() {
     async function getUser() {
       try {
         const res = await fetch('/api/auth/me');
+        if (!res.ok) {
+          setUser(null);
+          return;
+        }
         const data = await res.json();
-        setUser(data.user || null);
+        setUser(data.data || data.user || null);
       } catch (err) {
         console.error('Failed to fetch user', err);
+        setUser(null);
       }
     }
     getUser();

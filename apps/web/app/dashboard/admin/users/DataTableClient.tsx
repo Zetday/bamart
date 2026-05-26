@@ -4,7 +4,7 @@ import { useState } from 'react';
 import DataTable from '@/components/DataTable';
 import ActionButtons from '@/components/ActionButtons';
 import Modal from '@/components/Modal';
-import { Plus, Users, Trash2, UserCircle, X } from 'lucide-react';
+import { Plus, Trash2, UserCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface UserRow {
@@ -79,21 +79,16 @@ export default function DataTableClient({ rows }: { rows: UserRow[] }) {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* PAGE HEADER */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-[#7D1972] flex items-center justify-center">
-            <Users size={18} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-900">Daftar User</h1>
-            <p className="text-xs text-slate-500">{data.length} pengguna terdaftar</p>
-          </div>
+    <div className="space-y-6">
+      {/* HEADER */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Daftar User</h1>
+          <p className="text-slate-500 text-sm mt-1">{data.length} pengguna terdaftar</p>
         </div>
         <button
           onClick={doAdd}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#7D1972] text-white text-sm font-medium hover:bg-[#6a1560] transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#7D1972] hover:bg-[#9c2292] text-white text-sm font-medium rounded-lg transition-colors cursor-pointer"
         >
           <Plus size={16} />
           Tambah User
@@ -101,7 +96,7 @@ export default function DataTableClient({ rows }: { rows: UserRow[] }) {
       </div>
 
       {/* TABLE CARD */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <DataTable
           columns={[
             { key: 'name', label: 'Nama' },
@@ -129,57 +124,39 @@ export default function DataTableClient({ rows }: { rows: UserRow[] }) {
       </div>
 
       {/* FORM MODAL */}
-      <Modal open={openForm} onClose={() => setOpenForm(false)}>
-        <div className="w-full max-w-md">
-          {/* Modal Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#7D1972]/10 flex items-center justify-center">
-                <UserCircle size={16} className="text-[#7D1972]" />
-              </div>
-              <h2 className="text-base font-semibold text-slate-900">
-                {selected ? 'Edit User' : 'Tambah User'}
-              </h2>
-            </div>
-            <button onClick={() => setOpenForm(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
-              <X size={18} />
-            </button>
-          </div>
-          {/* Modal Body */}
-          <UserForm
-            initial={selected ?? undefined}
-            onSubmit={(form) => (selected ? updateUser(form) : addUser(form))}
-          />
-        </div>
+      <Modal open={openForm} onClose={() => setOpenForm(false)} size="md">
+        <UserForm
+          initial={selected ?? undefined}
+          onCancel={() => setOpenForm(false)}
+          onSubmit={(form) => (selected ? updateUser(form) : addUser(form))}
+        />
       </Modal>
 
       {/* DELETE MODAL */}
-      <Modal open={openDelete} onClose={() => setOpenDelete(false)}>
-        <div className="w-full max-w-sm">
-          <div className="p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-4">
-              <Trash2 size={24} className="text-red-500" />
-            </div>
-            <h2 className="text-base font-semibold text-slate-900 mb-1">Hapus User?</h2>
-            <p className="text-sm text-slate-500 mb-6">
-              Aksi ini akan menghapus{' '}
-              <span className="font-medium text-slate-700">{selected?.name}</span>{' '}
-              secara permanen.
-            </p>
-            <div className="flex gap-3">
-              <button
-                className="flex-1 py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-                onClick={() => setOpenDelete(false)}
-              >
-                Batal
-              </button>
-              <button
-                className="flex-1 py-2.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
-                onClick={deleteUser}
-              >
-                Ya, Hapus
-              </button>
-            </div>
+      <Modal open={openDelete} onClose={() => setOpenDelete(false)} size="sm">
+        <div className="text-center p-2">
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border border-red-100">
+            <Trash2 size={24} className="text-red-500" />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900 mb-1">Hapus User?</h2>
+          <p className="text-sm text-slate-500 mb-6">
+            Aksi ini akan menghapus{' '}
+            <span className="font-semibold text-slate-700">{selected?.name}</span>{' '}
+            secara permanen.
+          </p>
+          <div className="flex gap-3">
+            <button
+              className="flex-1 py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+              onClick={() => setOpenDelete(false)}
+            >
+              Batal
+            </button>
+            <button
+              className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors cursor-pointer"
+              onClick={deleteUser}
+            >
+              Ya, Hapus
+            </button>
           </div>
         </div>
       </Modal>
@@ -192,9 +169,11 @@ export default function DataTableClient({ rows }: { rows: UserRow[] }) {
 function UserForm({
   initial,
   onSubmit,
+  onCancel,
 }: {
   initial?: UserRow;
   onSubmit: (u: UserRow) => void;
+  onCancel: () => void;
 }) {
   const [form, setForm] = useState(() => ({
     id: initial?.id ?? 0,
@@ -205,13 +184,22 @@ function UserForm({
 
   return (
     <form
-      className="px-6 py-5 space-y-4"
+      className="space-y-4"
       onSubmit={(e) => { e.preventDefault(); onSubmit(form); }}
     >
+      <div className="flex items-center gap-3 mb-5 border-b border-slate-100 pb-4">
+        <div className="w-9 h-9 rounded-lg bg-[#7D1972]/10 flex items-center justify-center shrink-0">
+          <UserCircle size={20} className="text-[#7D1972]" />
+        </div>
+        <h2 className="text-lg font-bold text-slate-800">
+          {initial ? 'Edit User' : 'Tambah User'}
+        </h2>
+      </div>
+
       <div>
         <label className="block text-xs font-semibold text-slate-600 mb-1.5">Nama</label>
         <input
-          className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
           placeholder="Nama pengguna"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -223,7 +211,7 @@ function UserForm({
         <label className="block text-xs font-semibold text-slate-600 mb-1.5">Email</label>
         <input
           type="email"
-          className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
           placeholder="user@email.com"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -234,7 +222,7 @@ function UserForm({
       <div>
         <label className="block text-xs font-semibold text-slate-600 mb-1.5">Role</label>
         <select
-          className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all bg-white"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all bg-white"
           value={form.role}
           onChange={(e) => setForm({ ...form, role: e.target.value })}
         >
@@ -244,12 +232,22 @@ function UserForm({
         </select>
       </div>
 
-      <button
-        type="submit"
-        className="w-full py-2.5 mt-1 rounded-lg bg-[#7D1972] text-white text-sm font-semibold hover:bg-[#6a1560] transition-colors"
-      >
-        Simpan
-      </button>
+      <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 mt-5">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-sm font-medium border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
+        >
+          Batal
+        </button>
+        <button
+          type="submit"
+          className="px-5 py-2.5 text-sm font-semibold bg-[#7D1972] hover:bg-[#6a1560] text-white rounded-lg transition-colors cursor-pointer"
+        >
+          Simpan
+        </button>
+      </div>
     </form>
   );
 }
+

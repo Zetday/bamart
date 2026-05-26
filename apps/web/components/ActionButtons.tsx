@@ -15,13 +15,10 @@ export default function ActionButtons({ onDetail, onEdit, onDelete }: Props) {
       {onDetail && (
         <button
           onClick={onDetail}
-          className="group relative flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white border-2 border-transparent hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 rounded-lg shadow-sm transition-all cursor-pointer"
           title="Lihat Detail"
         >
-          <Eye
-            size={14}
-            className="group-hover:scale-110 transition-transform duration-300"
-          />
+          <Eye size={13} />
           <span>Detail</span>
         </button>
       )}
@@ -29,13 +26,10 @@ export default function ActionButtons({ onDetail, onEdit, onDelete }: Props) {
       {onEdit && (
         <button
           onClick={onEdit}
-          className="group relative flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white border-2 border-transparent hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-sky-700 bg-sky-50 border border-sky-100 hover:bg-sky-100 hover:text-sky-800 rounded-lg transition-all cursor-pointer"
           title="Edit Data"
         >
-          <Edit2
-            size={14}
-            className="group-hover:scale-110 transition-transform duration-300"
-          />
+          <Edit2 size={13} />
           <span>Edit</span>
         </button>
       )}
@@ -43,16 +37,14 @@ export default function ActionButtons({ onDetail, onEdit, onDelete }: Props) {
       {onDelete && (
         <button
           onClick={onDelete}
-          className="group relative flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white border-2 border-transparent hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300 hover:scale-105"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-100 hover:bg-red-100 hover:text-red-800 rounded-lg transition-all cursor-pointer"
           title="Hapus Data"
         >
-          <Trash2
-            size={14}
-            className="group-hover:scale-110 transition-transform duration-300"
-          />
+          <Trash2 size={13} />
           <span>Hapus</span>
         </button>
       )}
     </div>
   );
 }
+

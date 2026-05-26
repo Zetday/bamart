@@ -73,35 +73,35 @@ export default function DataTable<T>({
   return (
     <div className="space-y-4">
       {/* HEADER CONTROLS */}
-      <div className="flex justify-between items-center flex-wrap gap-4 px-6 py-4 bg-gradient-to-r from-gray-50 to-purple-50 rounded-t-2xl border-b border-gray-200">
+      <div className="flex justify-between items-center flex-wrap gap-4 px-6 py-4 bg-slate-50/75 rounded-t-2xl border-b border-slate-100">
         {/* TAMPILKAN X DATA */}
-        <div className="flex items-center gap-3 text-gray-700">
-          <span className="font-medium">Tampilkan</span>
+        <div className="flex items-center gap-2.5 text-sm font-medium text-slate-600">
+          <span>Tampilkan</span>
           <select
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
               setPage(1);
             }}
-            className="border-2 border-gray-200 rounded-lg px-4 py-2 bg-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300 font-medium"
+            className="border border-slate-200 rounded-xl px-3 py-1.5 bg-white focus:outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all text-sm font-semibold text-slate-700 shadow-xs cursor-pointer"
           >
             {[10, 25, 50, 100].map((num) => (
               <option key={num}>{num}</option>
             ))}
           </select>
-          <span className="font-medium">data</span>
+          <span>data</span>
         </div>
 
         {/* SEARCH BAR MODERN */}
         <div className="relative">
           <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-            size={20}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+            size={18}
           />
           <input
             type="text"
             placeholder="Cari data..."
-            className="pl-12 pr-6 py-2.5 bg-white border-2 border-gray-200 rounded-full focus:ring-2 focus:ring-purple-200 focus:border-purple-500 transition-all duration-300 outline-none w-64 font-medium text-gray-700 placeholder:text-gray-400"
+            className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D1972]/10 focus:border-[#7D1972] transition-all outline-none w-64 text-sm font-medium text-slate-700 placeholder:text-slate-400 shadow-xs"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -115,9 +115,9 @@ export default function DataTable<T>({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-gray-700 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-purple-50">
+            <tr className="text-slate-600 border-b border-slate-200 bg-slate-50/50">
               {showIndex && (
-                <th className="p-4 font-bold text-left uppercase tracking-wide text-xs w-14">
+                <th className="px-6 py-4 font-bold text-left uppercase tracking-wider text-[11px] w-14">
                   No.
                 </th>
               )}
@@ -125,12 +125,12 @@ export default function DataTable<T>({
                 const isSorted = sortField === col.key;
                 const icon =
                   isSorted && sortDirection === 'asc' ? (
-                    <ChevronUp size={16} className="text-purple-600" />
+                    <ChevronUp size={14} className="text-[#7D1972]" />
                   ) : isSorted && sortDirection === 'desc' ? (
-                    <ChevronDown size={16} className="text-purple-600" />
+                    <ChevronDown size={14} className="text-[#7D1972]" />
                   ) : (
-                    <div className="w-4 h-4 opacity-0">
-                      <ChevronUp size={16} />
+                    <div className="w-3.5 h-3.5 opacity-0">
+                      <ChevronUp size={14} />
                     </div>
                   );
 
@@ -138,9 +138,9 @@ export default function DataTable<T>({
                   <th
                     key={String(col.key)}
                     onClick={() => handleSort(col.key)}
-                    className="p-4 cursor-pointer hover:text-purple-600 transition-all duration-300 font-bold text-left uppercase tracking-wide text-xs"
+                    className="px-6 py-4 cursor-pointer hover:text-[#7D1972] transition-colors font-bold text-left uppercase tracking-wider text-[11px]"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       {col.label}
                       {icon}
                     </div>
@@ -149,7 +149,7 @@ export default function DataTable<T>({
               })}
 
               {actions && (
-                <th className="p-4 text-center font-bold uppercase tracking-wide text-xs">
+                <th className="px-6 py-4 text-center font-bold uppercase tracking-wider text-[11px]">
                   Aksi
                 </th>
               )}
@@ -160,40 +160,40 @@ export default function DataTable<T>({
             {paginated.map((row, i) => (
               <tr
                 key={i}
-                className="border-b border-gray-100 hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent transition-all duration-300"
+                className="border-b border-slate-100 hover:bg-slate-50/40 transition-colors duration-150"
               >
                 {showIndex && (
-                  <td className="p-4 text-gray-500 font-medium text-sm w-14">
+                  <td className="px-6 py-4 text-slate-500 font-medium text-sm w-14">
                     {start + i + 1}
                   </td>
                 )}
                 {columns.map((col) => (
-                  <td key={String(col.key)} className="p-4 text-gray-700">
+                  <td key={String(col.key)} className="px-6 py-4 text-slate-700 font-medium">
                     {col.format
                       ? col.format(row[col.key], row)
                       : String(row[col.key])}
                   </td>
                 ))}
 
-                {actions && <td className="p-4 text-center">{actions(row)}</td>}
+                {actions && <td className="px-6 py-4 text-center">{actions(row)}</td>}
               </tr>
             ))}
 
             {paginated.length === 0 && (
               <tr>
                 <td
-                  colSpan={columns.length + (actions ? 1 : 0)}
-                  className="p-12 text-center text-gray-500"
+                  colSpan={columns.length + (actions ? 1 : 0) + (showIndex ? 1 : 0)}
+                  className="p-12 text-center text-slate-500"
                 >
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
-                      <Search className="text-gray-400" size={32} />
+                    <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                      <Search className="text-slate-400" size={24} />
                     </div>
-                    <p className="text-lg font-medium">
+                    <p className="text-base font-semibold text-slate-700">
                       Tidak ada data ditemukan
                     </p>
-                    <p className="text-sm text-gray-400">
-                      Coba ubah filter atau kata kunci pencarian
+                    <p className="text-xs text-slate-400">
+                      Coba ubah kata kunci pencarian
                     </p>
                   </div>
                 </td>
@@ -204,14 +204,14 @@ export default function DataTable<T>({
       </div>
 
       {/* FOOTER */}
-      <div className="flex justify-between items-center text-sm text-gray-600 px-6 py-4 bg-gradient-to-r from-gray-50 to-purple-50 rounded-b-2xl border-t border-gray-200">
+      <div className="flex justify-between items-center text-sm text-slate-500 px-6 py-4 bg-slate-50/75 rounded-b-2xl border-t border-slate-100">
         {/* INFO */}
-        <p className="font-medium">
+        <p className="font-medium text-slate-500">
           Menampilkan{' '}
-          <span className="text-purple-600 font-bold">
+          <span className="text-[#7D1972] font-semibold">
             {start + 1}-{Math.min(end, total)}
           </span>{' '}
-          dari <span className="text-purple-600 font-bold">{total}</span> data
+          dari <span className="text-[#7D1972] font-semibold">{total}</span> data
         </p>
 
         {/* PAGINATION MODERN */}
@@ -220,23 +220,21 @@ export default function DataTable<T>({
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-lg border-2 border-gray-200 hover:bg-white hover:border-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:border-gray-200 transition-all duration-300 font-medium"
+            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 disabled:hover:bg-white transition-all text-sm font-semibold shadow-xs cursor-pointer"
           >
             Prev
           </button>
 
-          {/* Page Numbers - Smart Display */}
+          {/* Page Numbers */}
           {(() => {
             const maxVisible = 5;
             const pages: (number | string)[] = [];
 
             if (totalPages <= maxVisible) {
-              // Show all pages
               for (let i = 1; i <= totalPages; i++) {
                 pages.push(i);
               }
             } else {
-              // Smart pagination
               if (page <= 3) {
                 pages.push(1, 2, 3, 4, '...', totalPages);
               } else if (page >= totalPages - 2) {
@@ -266,16 +264,16 @@ export default function DataTable<T>({
                 <button
                   key={i}
                   onClick={() => setPage(p)}
-                  className={`px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                  className={`px-3.5 py-2 rounded-xl border font-semibold transition-all text-sm shadow-xs ${
                     page === p
-                      ? 'bg-gradient-to-r from-[#7D1972] to-[#b14fab] text-white border-transparent shadow-lg shadow-purple-500/30'
-                      : 'border-gray-200 hover:bg-white hover:border-purple-500 hover:text-purple-600'
+                      ? 'bg-[#7D1972] text-white border-transparent shadow-sm'
+                      : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer'
                   }`}
                 >
                   {p}
                 </button>
               ) : (
-                <span key={i} className="px-2 text-gray-400">
+                <span key={i} className="px-2 text-slate-400">
                   {p}
                 </span>
               )
@@ -286,7 +284,7 @@ export default function DataTable<T>({
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 rounded-lg border-2 border-gray-200 hover:bg-white hover:border-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:border-gray-200 transition-all duration-300 font-medium"
+            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 disabled:hover:bg-white transition-all text-sm font-semibold shadow-xs cursor-pointer"
           >
             Next
           </button>

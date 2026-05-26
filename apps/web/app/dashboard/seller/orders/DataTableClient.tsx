@@ -27,7 +27,8 @@ interface OrderItemDetail {
   id: number;
   quantity: number;
   subtotal: number;
-  item: {
+  itemName?: string;
+  item?: {
     id: number;
     name: string;
     price: number;
@@ -57,8 +58,12 @@ export default function OrdersSellerClient({ rows }: { rows: OrderRow[] }) {
 
     try {
       const res = await fetch(`/api/orders/${row.id}`);
-      const data: OrderDetail = await res.json();
-      setDetailData(data);
+      const envelope = await res.json();
+      if (envelope.success && envelope.data) {
+        setDetailData(envelope.data);
+      } else {
+        setDetailData(envelope);
+      }
     } catch {
       toast.error('Gagal memuat detail order');
     } finally {
@@ -67,7 +72,7 @@ export default function OrdersSellerClient({ rows }: { rows: OrderRow[] }) {
   }, []);
 
   return (
-    <div className="flex-1 bg-slate-50 min-h-screen p-8">
+    <div className="space-y-6">
       {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Order Masuk</h1>
@@ -133,7 +138,7 @@ export default function OrdersSellerClient({ rows }: { rows: OrderRow[] }) {
       </div>
 
       {/* DETAIL MODAL */}
-      <Modal open={openDetail} onClose={() => setOpenDetail(false)}>
+      <Modal open={openDetail} onClose={() => setOpenDetail(false)} size="xl">
         {loadingDetail ? (
           <div className="flex items-center justify-center p-12">
             <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -188,25 +193,26 @@ export default function OrdersSellerClient({ rows }: { rows: OrderRow[] }) {
               </h3>
 
               <div className="space-y-3">
-                {detailData.items.map((it) => (
-                  <div
-                    key={it.id}
-                    className="flex justify-between items-center border-b pb-3"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        {it.item.name}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Qty: {it.quantity} × Rp{' '}
-                        {it.item.price.toLocaleString('id-ID')}
+                {Array.isArray(detailData?.items) &&
+                  detailData.items.map((it) => (
+                    <div
+                      key={it.id}
+                      className="flex justify-between items-center border-b pb-3"
+                    >
+                      <div>
+                        <p className="font-medium text-gray-800">
+                          {it.itemName || it.item?.name || 'Barang'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Qty: {it.quantity} × Rp{' '}
+                          {(it.item?.price ?? (it.quantity > 0 ? it.subtotal / it.quantity : 0)).toLocaleString('id-ID')}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-green-600">
+                        Rp {it.subtotal.toLocaleString('id-ID')}
                       </p>
                     </div>
-                    <p className="font-semibold text-green-600">
-                      Rp {it.subtotal.toLocaleString('id-ID')}
-                    </p>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
 

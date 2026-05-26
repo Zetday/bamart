@@ -1,13 +1,14 @@
 package handler
 
-import "github.com/gofiber/fiber/v3"
+import (
+	"project-bamart2/apps/api/internal/shared/middleware"
+
+	"github.com/gofiber/fiber/v3"
+)
 
 func RegisterRoutes(router fiber.Router, h *SummaryHandler, jwtMiddleware fiber.Handler) {
-	// e.g. add middleware.RequireRole("ADMIN") alongside jwtMiddleware if needed
-	router.Get("/admin/summary", jwtMiddleware, h.GetAdminSummary)
-
-	// e.g. add middleware.RequireRole("SELLER") alongside jwtMiddleware if needed
-	router.Get("/seller/summary", jwtMiddleware, h.GetSellerSummary)
+	router.Get("/admin/summary", jwtMiddleware, middleware.RequireRole("ADMIN"), h.GetAdminSummary)
+	router.Get("/seller/summary", jwtMiddleware, middleware.RequireRole("SELLER"), h.GetSellerSummary)
 
 	// Public
 	router.Get("/stats", h.GetPublicStats)

@@ -5,14 +5,15 @@ import DataTable from '@/components/DataTable';
 import ActionButtons from '@/components/ActionButtons';
 import Modal from '@/components/Modal';
 import toast from 'react-hot-toast';
-import { ShoppingCart, Eye, Receipt, Package, Trash2 } from 'lucide-react';
+import { ShoppingCart, Receipt, Package, Trash2 } from 'lucide-react';
 
 /* TYPES */
 interface OrderItemDetail {
   id: number;
   quantity: number;
   subtotal: number;
-  item: {
+  itemName?: string;
+  item?: {
     id: number;
     name: string;
     price: number;
@@ -86,8 +87,12 @@ export default function OrdersTableClient({
 
     try {
       const res = await fetch(`/api/orders/${row.id}`);
-      const data: OrderDetail = await res.json();
-      setDetailData(data);
+      const envelope = await res.json();
+      if (envelope.success && envelope.data) {
+        setDetailData(envelope.data);
+      } else {
+        setDetailData(envelope);
+      }
     } catch {
       toast.error('Gagal memuat detail order');
     } finally {
@@ -124,7 +129,7 @@ export default function OrdersTableClient({
   };
 
   return (
-    <div className="flex-1 bg-slate-50 min-h-screen p-8">
+    <div className="space-y-6">
       {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Daftar Order</h1>
@@ -182,7 +187,7 @@ export default function OrdersTableClient({
           showIndex
           data={data}
           actions={(row) => (
-            <div className="flex justify-end">
+            <div className="flex justify-center">
               <ActionButtons
                 id={row.id}
                 onDetail={() => doDetail(row)}
@@ -195,48 +200,49 @@ export default function OrdersTableClient({
       </div>
 
       {/* EDIT MODAL */}
-      <Modal open={openEdit} onClose={() => setOpenEdit(false)}>
+      <Modal open={openEdit} onClose={() => setOpenEdit(false)} size="md">
         {selected && (
           <OrderForm
             buyers={buyers}
             initial={selected}
+            onCancel={() => setOpenEdit(false)}
             onSubmit={updateOrder}
           />
         )}
       </Modal>
 
       {/* DELETE MODAL */}
-      <Modal open={openDelete} onClose={() => setOpenDelete(false)}>
-        <div className="text-center p-6">
-          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
-            <Trash2 className="text-red-500" size={28} />
+      <Modal open={openDelete} onClose={() => setOpenDelete(false)} size="sm">
+        <div className="text-center p-2">
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border border-red-100">
+            <Trash2 className="text-red-500" size={24} />
           </div>
-          <h2 className="text-xl font-bold text-slate-900 mb-1">
+          <h2 className="text-lg font-bold text-slate-900 mb-1">
             Hapus Order #{selected?.id}?
           </h2>
           <p className="text-slate-500 text-sm mb-6">
             Yakin ingin menghapus order milik{' '}
             <span className="font-semibold text-slate-700">{selected?.buyer}</span>?
           </p>
-          <div className="flex justify-center gap-3">
+          <div className="flex gap-3">
             <button
-              className="px-5 py-2.5 text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
+              className="flex-1 py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
               onClick={() => setOpenDelete(false)}
             >
               Batal
             </button>
             <button
-              className="px-5 py-2.5 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors cursor-pointer"
               onClick={deleteOrder}
             >
-              Hapus
+              Ya, Hapus
             </button>
           </div>
         </div>
       </Modal>
 
       {/* DETAIL MODAL */}
-      <Modal open={openDetail} onClose={() => setOpenDetail(false)}>
+      <Modal open={openDetail} onClose={() => setOpenDetail(false)} size="xl">
         {loadingDetail ? (
           <div className="flex items-center justify-center p-12">
             <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -291,25 +297,26 @@ export default function OrdersTableClient({
               </h3>
 
               <div className="space-y-3">
-                {detailData.items.map((it) => (
-                  <div
-                    key={it.id}
-                    className="flex justify-between items-center border-b pb-3"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        {it.item.name}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Qty: {it.quantity} × Rp{' '}
-                        {it.item.price.toLocaleString('id-ID')}
+                {Array.isArray(detailData?.items) &&
+                  detailData.items.map((it) => (
+                    <div
+                      key={it.id}
+                      className="flex justify-between items-center border-b pb-3"
+                    >
+                      <div>
+                        <p className="font-medium text-gray-800">
+                          {it.itemName || it.item?.name || 'Barang'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Qty: {it.quantity} × Rp{' '}
+                          {(it.item?.price ?? (it.quantity > 0 ? it.subtotal / it.quantity : 0)).toLocaleString('id-ID')}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-green-600">
+                        Rp {it.subtotal.toLocaleString('id-ID')}
                       </p>
                     </div>
-                    <p className="font-semibold text-green-600">
-                      Rp {it.subtotal.toLocaleString('id-ID')}
-                    </p>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
 
@@ -336,10 +343,12 @@ function OrderForm({
   buyers,
   initial,
   onSubmit,
+  onCancel,
 }: {
   buyers: BuyerOption[];
   initial: OrderRow;
   onSubmit: (order: OrderRow) => void;
+  onCancel: () => void;
 }) {
   const [form, setForm] = useState<OrderRow>(initial);
 
@@ -355,21 +364,20 @@ function OrderForm({
         onSubmit(form);
       }}
     >
-      {/* HEADER (DIPADATKAN) */}
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-9 h-9 rounded-lg bg-[#7D1972] flex items-center justify-center">
-          <ShoppingCart className="text-white" size={18} />
+      <div className="flex items-center gap-3 mb-5 border-b border-slate-100 pb-4">
+        <div className="w-9 h-9 rounded-lg bg-[#7D1972]/10 flex items-center justify-center shrink-0">
+          <ShoppingCart className="text-[#7D1972]" size={18} />
         </div>
-        <h2 className="text-xl font-bold text-slate-800">Edit Order</h2>
+        <h2 className="text-lg font-bold text-slate-800">Edit Order</h2>
       </div>
 
       {/* BUYER */}
       <div>
-        <label className="block text-xs font-semibold text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-slate-600 mb-1.5">
           Pembeli
         </label>
         <select
-          className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all bg-white"
           value={form.buyerId}
           onChange={(e) => {
             const id = Number(e.target.value);
@@ -387,24 +395,25 @@ function OrderForm({
 
       {/* TOTAL PRICE */}
       <div>
-        <label className="block text-xs font-semibold text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-slate-600 mb-1.5">
           Total Harga (Rp)
         </label>
         <input
           type="number"
-          className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
           value={form.totalPrice}
           onChange={(e) => field('totalPrice', Number(e.target.value))}
+          required
         />
       </div>
 
       {/* STATUS */}
       <div>
-        <label className="block text-xs font-semibold text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-slate-600 mb-1.5">
           Status
         </label>
         <select
-          className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all bg-white"
           value={form.status}
           onChange={(e) => field('status', e.target.value)}
         >
@@ -418,82 +427,100 @@ function OrderForm({
 
       {/* FULL NAME */}
       <div>
-        <label className="block text-xs font-semibold text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-slate-600 mb-1.5">
           Nama Lengkap
         </label>
         <input
-          className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
           value={form.fullName}
           onChange={(e) => field('fullName', e.target.value)}
+          required
         />
       </div>
 
       {/* PHONE */}
       <div>
-        <label className="block text-xs font-semibold text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-slate-600 mb-1.5">
           Telepon
         </label>
         <input
-          className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
           value={form.phone}
           onChange={(e) => field('phone', e.target.value)}
+          required
         />
       </div>
 
       {/* ADDRESS */}
       <div>
-        <label className="block text-xs font-semibold text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-slate-600 mb-1.5">
           Alamat
         </label>
         <textarea
           rows={2}
-          className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400 resize-none"
           value={form.address}
           onChange={(e) => field('address', e.target.value)}
+          required
         />
       </div>
 
       {/* CITY & POSTAL CODE */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">
             Kota
           </label>
           <input
-            className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+            className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
             value={form.city}
             onChange={(e) => field('city', e.target.value)}
+            required
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">
             Kode Pos
           </label>
           <input
-            className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+            className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400"
             value={form.postalCode}
             onChange={(e) => field('postalCode', e.target.value)}
+            required
           />
         </div>
       </div>
 
       {/* NOTES */}
       <div>
-        <label className="block text-xs font-semibold text-gray-700 mb-1">
+        <label className="block text-xs font-semibold text-slate-600 mb-1.5">
           Catatan
         </label>
         <textarea
           rows={1}
-          className="w-full py-2 px-3 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-200 outline-none transition"
+          className="w-full px-3 py-2.5 text-sm border-2 border-slate-200 rounded-xl outline-none focus:border-[#7D1972] focus:ring-2 focus:ring-[#7D1972]/10 transition-all placeholder-slate-400 resize-none"
           value={form.notes}
           onChange={(e) => field('notes', e.target.value)}
         />
       </div>
 
-      {/* SAVE BUTTON */}
-      <button className="w-full py-2.5 rounded-lg bg-[#7D1972] hover:bg-[#9c2292] text-white font-semibold transition-colors">
-        Simpan
-      </button>
+      {/* FOOTER BUTTONS */}
+      <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 mt-5">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-sm font-medium border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
+        >
+          Batal
+        </button>
+        <button
+          type="submit"
+          className="px-5 py-2.5 text-sm font-semibold bg-[#7D1972] hover:bg-[#6a1560] text-white rounded-lg transition-colors cursor-pointer"
+        >
+          Simpan
+        </button>
+      </div>
     </form>
   );
 }
+
