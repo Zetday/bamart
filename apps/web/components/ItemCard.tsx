@@ -150,18 +150,18 @@ export default function ItemCard({
           </div>
 
           {/* PRICE + BUTTON */}
-          <div className="flex flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between mt-auto pt-3 border-t border-gray-100">
+          <div className="flex flex-col gap-2 sm:gap-3 mt-auto pt-3 border-t border-gray-100">
             <p className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
               Rp{priceFormatter.format(item.price)}
             </p>
 
             <div
-              className="w-full lg:w-auto text-center rounded-md sm:rounded-lg
+              className="w-full text-center rounded-md sm:rounded-lg
               min-h-9 sm:min-h-10
               px-3 sm:px-4 py-2
               text-xs sm:text-sm md:text-base
               font-medium whitespace-nowrap
-              bg-[#7D1972] text-white lg:hover:bg-[#9E1E93] transition"
+              bg-[#7D1972] text-white hover:bg-[#9E1E93] transition"
             >
               Lihat
             </div>

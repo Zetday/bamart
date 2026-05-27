@@ -8,6 +8,7 @@ interface SidebarProps {
   onCategoryFilter?: (category: string) => void;
   onBrandFilter?: (sellerName: string) => void;
   onResetFilters?: () => void;
+  isMobile?: boolean;
 }
 
 interface Category {
@@ -26,6 +27,7 @@ export default function Sidebar({
   onCategoryFilter,
   onBrandFilter,
   onResetFilters,
+  isMobile = false,
 }: SidebarProps) {
   const numberFormatter = useMemo(() => new Intl.NumberFormat('id-ID'), []);
 
@@ -140,232 +142,234 @@ export default function Sidebar({
     onPriceFilter(minPrice, maxPrice);
   };
 
-  return (
-    <aside className="hidden md:block w-72 bg-white border-r border-gray-300">
-      <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-72 overflow-y-auto pr-5 pl-8 py-8 space-y-6 bg-white">
-        {/* ===== RESET FILTER BUTTON ===== */}
-        {hasActiveFilters && onResetFilters && (
-          <div>
-            <button
-              onClick={onResetFilters}
-              className="w-full px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
-            >
-              Reset Semua Filter
-            </button>
-            <hr className="mt-4 border-gray-300" />
-          </div>
-        )}
+  const wrapperClass = isMobile
+    ? 'flex-1 overflow-y-auto pr-5 pl-8 py-8 space-y-6 bg-white'
+    : 'fixed top-16 left-0 h-[calc(100vh-4rem)] w-72 overflow-y-auto pr-5 pl-8 py-8 space-y-6 bg-white';
 
-        {/* ===== PRODUK UMKM ===== */}
+  const renderContent = () => (
+    <div className={wrapperClass}>
+      {/* ===== RESET FILTER BUTTON ===== */}
+      {hasActiveFilters && onResetFilters && (
         <div>
-          <h2 className="font-bold text-gray-900 text-sm mb-2">
-            Jelajahi Produk UMKM Banjarmasin
-          </h2>
-
-          <div className="space-y-1 text-sm text-gray-700">
-            {loadingCategories ? (
-              <p className="text-gray-400">Memuat kategori...</p>
-            ) : categories.length === 0 ? (
-              <p className="text-gray-400">Tidak ada kategori</p>
-            ) : (
-              categories.slice(0, 3).map((category) => (
-                <a
-                  key={category.id}
-                  href="#"
-                  onClick={(e) => handleCategoryClick(e, category.name)}
-                  className="block hover:underline"
-                >
-                  {category.name}
-                </a>
-              ))
-            )}
-          </div>
-
+          <button
+            onClick={onResetFilters}
+            className="w-full px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
+          >
+            Reset Semua Filter
+          </button>
           <hr className="mt-4 border-gray-300" />
         </div>
+      )}
 
-        {/* ===== HARGA ===== */}
-        <div>
-          <h3 className="font-bold text-gray-900 mb-2 text-sm">Harga</h3>
-          <p className="font-bold text-black mb-3">
-            Rp{numberFormatter.format(minPrice)} – Rp
-            {numberFormatter.format(maxPrice)}
-            {maxPrice >= 5000000 ? '+' : ''}
-          </p>
+      {/* ===== PRODUK UMKM ===== */}
+      <div>
+        <h2 className="font-bold text-gray-900 text-sm mb-2">
+          Jelajahi Produk UMKM Banjarmasin
+        </h2>
 
-          {/* PRICE RANGE COMPONENT - Amazon Style */}
-          <div className="relative mb-8">
-            <div className="s-range-container">
-              {/* MIN SLIDER */}
-              <div className="s-range-input-container s-lower-bound">
-                <input
-                  ref={minSliderRef}
-                  type="range"
-                  className="s-range-input"
-                  min={0}
-                  max={5000000}
-                  value={minPrice}
-                  step={10000}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    if (v < maxPrice) setMinPrice(v);
-                  }}
-                  aria-label="Minimum price"
-                  aria-valuemin={0}
-                  aria-valuenow={minPrice}
-                  aria-valuemax={5000000}
-                />
-              </div>
-
-              {/* MAX SLIDER */}
-              <div className="s-range-input-container s-upper-bound">
-                <input
-                  ref={maxSliderRef}
-                  type="range"
-                  className="s-range-input"
-                  min={0}
-                  max={5000000}
-                  value={maxPrice}
-                  step={10000}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    if (v > minPrice) setMaxPrice(v);
-                  }}
-                  aria-label="Maximum price"
-                  aria-valuemin={0}
-                  aria-valuenow={maxPrice}
-                  aria-valuemax={5000000}
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={handleApplyFilter}
-              className="mt-3 px-4 py-1.5 text-sm border border-gray-400 rounded-md bg-white hover:bg-gray-50 transition-colors"
-            >
-              Terapkan
-            </button>
-          </div>
-        </div>
-
-        {/* ===== PROMO ===== */}
-        <div>
-          <h3 className="font-bold text-gray-900 mb-2 text-sm">
-            Promo & Diskon
-          </h3>
-          <a href="#" className="block hover:underline text-sm">
-            Semua Promo
-          </a>
-          <a href="#" className="block hover:underline text-sm">
-            Produk Diskon Hari Ini
-          </a>
-          <a href="#" className="block hover:underline text-sm">
-            Gratis Ongkir
-          </a>
-        </div>
-
-        {/* ===== ULASAN ===== */}
-        <div>
-          <h3 className="font-bold text-gray-900 mb-1 text-sm">
-            Ulasan Pelanggan
-          </h3>
-          <div className="flex items-center gap-1 text-orange-500 text-sm">
-            ⭐⭐⭐⭐⭐ <span className="text-gray-700">& Up</span>
-          </div>
-        </div>
-
-        {/* ===== KATEGORI ===== */}
-        <h3 className="font-bold text-gray-900 mb-2 text-sm">Kategori UMKM</h3>
         <div className="space-y-1 text-sm text-gray-700">
           {loadingCategories ? (
             <p className="text-gray-400">Memuat kategori...</p>
           ) : categories.length === 0 ? (
             <p className="text-gray-400">Tidak ada kategori</p>
           ) : (
-            <>
-              {categories.slice(0, 4).map((category) => (
-                <a
-                  key={category.id}
-                  href="#"
-                  onClick={(e) => handleCategoryClick(e, category.name)}
-                  className="block hover:underline"
-                >
-                  {category.name}
-                </a>
-              ))}
-
-              {categories.length > 4 && (
-                <>
-                  <button
-                    onClick={toggleMore}
-                    className="flex items-center gap-1 text-green-600 hover:underline"
-                  >
-                    <span>Lainnya</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${
-                        showMore ? 'rotate-180' : ''
-                      }`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-
-                  {showMore && (
-                    <div className="pl-2 space-y-1">
-                      {categories.slice(4).map((category) => (
-                        <a
-                          key={category.id}
-                          href="#"
-                          onClick={(e) => handleCategoryClick(e, category.name)}
-                          className="block hover:underline"
-                        >
-                          {category.name}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* ===== BRAND ===== */}
-        <div>
-          <h3 className="font-bold text-gray-900 mb-2 text-sm">
-            Brand Lokal Populer
-          </h3>
-
-          {loadingBrands ? (
-            <p className="text-gray-400 text-sm">Memuat brand...</p>
-          ) : brands.length === 0 ? (
-            <p className="text-gray-400 text-sm">Belum ada seller</p>
-          ) : (
-            brands.map((brand) => (
-              <label
-                key={brand.id}
-                className="flex items-center gap-2 text-sm cursor-pointer"
+            categories.slice(0, 3).map((category) => (
+              <a
+                key={category.id}
+                href="#"
+                onClick={(e) => handleCategoryClick(e, category.name)}
+                className="block hover:underline"
               >
-                <input
-                  type="radio"
-                  name="brand"
-                  value={brand.name}
-                  checked={selectedBrand === brand.name}
-                  onChange={() => handleBrandChange(brand.name)}
-                  className="h-4 w-4 accent-green-600"
-                />
-                {brand.name}
-              </label>
+                {category.name}
+              </a>
             ))
           )}
         </div>
+
+        <hr className="mt-4 border-gray-300" />
+      </div>
+
+      {/* ===== HARGA ===== */}
+      <div>
+        <h3 className="font-bold text-gray-900 mb-2 text-sm">Harga</h3>
+        <p className="font-bold text-black mb-3">
+          Rp{numberFormatter.format(minPrice)} – Rp
+          {numberFormatter.format(maxPrice)}
+          {maxPrice >= 5000000 ? '+' : ''}
+        </p>
+
+        {/* PRICE RANGE COMPONENT - Amazon Style */}
+        <div className="relative mb-8">
+          <div className="s-range-container">
+            {/* MIN SLIDER */}
+            <div className="s-range-input-container s-lower-bound">
+              <input
+                ref={minSliderRef}
+                type="range"
+                className="s-range-input"
+                min={0}
+                max={5000000}
+                value={minPrice}
+                step={10000}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  if (v < maxPrice) setMinPrice(v);
+                }}
+                aria-label="Minimum price"
+                aria-valuemin={0}
+                aria-valuenow={minPrice}
+                aria-valuemax={5000000}
+              />
+            </div>
+
+            {/* MAX SLIDER */}
+            <div className="s-range-input-container s-upper-bound">
+              <input
+                ref={maxSliderRef}
+                type="range"
+                className="s-range-input"
+                min={0}
+                max={5000000}
+                value={maxPrice}
+                step={10000}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  if (v > minPrice) setMaxPrice(v);
+                }}
+                aria-label="Maximum price"
+                aria-valuemin={0}
+                aria-valuenow={maxPrice}
+                aria-valuemax={5000000}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleApplyFilter}
+            className="mt-3 px-4 py-1.5 text-sm border border-gray-400 rounded-md bg-white hover:bg-gray-50 transition-colors"
+          >
+            Terapkan
+          </button>
+        </div>
+      </div>
+
+      {/* ===== PROMO ===== */}
+      <div>
+        <h3 className="font-bold text-gray-900 mb-2 text-sm">
+          Promo & Diskon
+        </h3>
+        <a href="#" className="block hover:underline text-sm">
+          Semua Promo
+        </a>
+        <a href="#" className="block hover:underline text-sm">
+          Produk Diskon Hari Ini
+        </a>
+        <a href="#" className="block hover:underline text-sm">
+          Gratis Ongkir
+        </a>
+      </div>
+
+      {/* ===== ULASAN ===== */}
+      <div>
+        <h3 className="font-bold text-gray-900 mb-1 text-sm">
+          Ulasan Pelanggan
+        </h3>
+        <div className="flex items-center gap-1 text-orange-500 text-sm">
+          ⭐⭐⭐⭐⭐ <span className="text-gray-700">& Up</span>
+        </div>
+      </div>
+
+      {/* ===== KATEGORI ===== */}
+      <h3 className="font-bold text-gray-900 mb-2 text-sm">Kategori UMKM</h3>
+      <div className="space-y-1 text-sm text-gray-700">
+        {loadingCategories ? (
+          <p className="text-gray-400">Memuat kategori...</p>
+        ) : categories.length === 0 ? (
+          <p className="text-gray-400">Tidak ada kategori</p>
+        ) : (
+          <>
+            {categories.slice(0, 4).map((category) => (
+              <a
+                key={category.id}
+                href="#"
+                onClick={(e) => handleCategoryClick(e, category.name)}
+                className="block hover:underline"
+              >
+                {category.name}
+              </a>
+            ))}
+
+            {categories.length > 4 && (
+              <>
+                <button
+                  onClick={toggleMore}
+                  className="flex items-center gap-1 text-green-600 hover:underline"
+                >
+                  <span>Lainnya</span>
+                  <svg
+                    className={`w-4 h-4 transition-transform ${
+                      showMore ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {showMore && (
+                  <div className="pl-2 space-y-1">
+                    {categories.slice(4).map((category) => (
+                      <a
+                        key={category.id}
+                        href="#"
+                        onClick={(e) => handleCategoryClick(e, category.name)}
+                        className="block hover:underline"
+                      >
+                        {category.name}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* ===== BRAND ===== */}
+      <div>
+        <h3 className="font-bold text-gray-900 mb-2 text-sm">
+          Brand Lokal Populer
+        </h3>
+
+        {loadingBrands ? (
+          <p className="text-gray-400 text-sm">Memuat brand...</p>
+        ) : brands.length === 0 ? (
+          <p className="text-gray-400 text-sm">Belum ada seller</p>
+        ) : (
+          brands.map((brand) => (
+            <label
+              key={brand.id}
+              className="flex items-center gap-2 text-sm cursor-pointer"
+            >
+              <input
+                type="radio"
+                name="brand"
+                value={brand.name}
+                checked={selectedBrand === brand.name}
+                onChange={() => handleBrandChange(brand.name)}
+                className="h-4 w-4 accent-green-600"
+              />
+              {brand.name}
+            </label>
+          ))
+        )}
       </div>
 
       {/* AMAZON-STYLE SLIDER CSS */}
@@ -468,6 +472,16 @@ export default function Sidebar({
             0 1px 4px rgba(0, 0, 0, 0.3);
         }
       `}</style>
+    </div>
+  );
+
+  if (isMobile) {
+    return renderContent();
+  }
+
+  return (
+    <aside className="hidden md:block w-72 bg-white border-r border-gray-300">
+      {renderContent()}
     </aside>
   );
 }

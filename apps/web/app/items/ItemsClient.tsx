@@ -26,6 +26,7 @@ export default function ItemsPage() {
   const [items, setItems] = useState<ItemWithCategory[]>([]);
   const [filteredItems, setFilteredItems] = useState<ItemWithCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   /* ==============================
         NUMBER FORMATTER (FIX)
@@ -166,6 +167,49 @@ export default function ItemsPage() {
   ------------------------------ */
   return (
     <div className="flex pt-15 md:pl-8">
+      {/* Mobile Drawer Backdrop */}
+      {isFilterOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-xs md:hidden"
+          onClick={() => setIsFilterOpen(false)}
+        />
+      )}
+
+      {/* Mobile Drawer Sidebar */}
+      <aside
+        className={`
+          fixed top-0 bottom-0 left-0 w-72 bg-white z-50 flex flex-col md:hidden
+          transition-transform duration-300 ease-in-out shadow-2xl pt-16
+          ${isFilterOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <button
+          onClick={() => setIsFilterOpen(false)}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 text-sm font-semibold cursor-pointer"
+        >
+          ✕
+        </button>
+        <Sidebar
+          isMobile
+          onPriceFilter={(min, max) => {
+            handlePriceFilter(min, max);
+            setIsFilterOpen(false);
+          }}
+          onCategoryFilter={(cat) => {
+            handleCategoryFilter(cat);
+            setIsFilterOpen(false);
+          }}
+          onBrandFilter={(b) => {
+            handleBrandFilter(b);
+            setIsFilterOpen(false);
+          }}
+          onResetFilters={() => {
+            handleResetFilters();
+            setIsFilterOpen(false);
+          }}
+        />
+      </aside>
+
       <aside className="w-64 hidden md:block min-h-screen">
         <Sidebar
           onPriceFilter={handlePriceFilter}
@@ -176,6 +220,22 @@ export default function ItemsPage() {
       </aside>
 
       <main className="flex-1 p-6">
+        {/* Mobile filter bar */}
+        <div className="flex md:hidden items-center justify-between gap-4 mb-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
+          <button
+            type="button"
+            onClick={() => setIsFilterOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#7D1972] text-white rounded-lg text-sm font-semibold hover:bg-[#9c2292] transition-all duration-200 cursor-pointer"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            Filter & Kategori
+          </button>
+          <span className="text-gray-500 text-sm">
+            ({filteredItems.length} produk)
+          </span>
+        </div>
         <div className="mb-4 flex flex-wrap gap-2 items-center">
           {searchParams.get('search') && (
             <p className="text-gray-600">
