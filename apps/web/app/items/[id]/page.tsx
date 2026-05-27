@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import CheckoutBar from '@/components/Checkoutbar';
+import ItemCard from '@/components/ItemCard';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { IoArrowBackOutline } from 'react-icons/io5';
@@ -73,134 +74,147 @@ export default async function ItemDetailPage({
   const stars = renderStars(randomRating);
 
   return (
-    // ✅ PENTING: padding-bottom untuk mobile
-    <div className="relative w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 pt-12 pb-24 sm:pb-[120px] lg:pb-0">
-      {/* GRID */}
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* ========== GALERI FOTO ========== */}
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <div
-              className="relative w-full h-[260px] sm:h-80 md:h-[380px] lg:h-[420px] 
-              bg-gray-300 rounded-xl overflow-hidden pt-10"
-            >
-              <Link
-                href="/items"
-                className="absolute top-3 left-3 z-20 bg-white/90 backdrop-blur 
-                px-3 py-1.5 rounded-full shadow text-[#7D1972] border border-[#7D1972]"
-              >
-                <IoArrowBackOutline size={20} />
-              </Link>
+    <div className="relative w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8 pt-20 sm:pt-20 pb-32 sm:pb-40 lg:pb-16 min-h-screen">
+      {/* BREADCRUMB / BACK LINK */}
+      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-8 mt-2">
+        <Link 
+          href="/items" 
+          className="hover:text-[#7D1972] transition-colors flex items-center gap-1.5 font-semibold text-[#7D1972] bg-white border border-gray-200 px-3.5 py-1.5 rounded-xl shadow-xs"
+        >
+          <IoArrowBackOutline size={16} /> Kembali ke Galeri
+        </Link>
+        <span className="text-gray-300">/</span>
+        <span className="text-gray-400 font-medium truncate max-w-[180px] sm:max-w-md">{item.name}</span>
+      </div>
 
+      {/* GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-6">
+        {/* ========== GALERI FOTO ========== */}
+        <div className="lg:col-span-5">
+          <div className="lg:sticky lg:top-24 bg-white border border-gray-100 rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col items-center justify-center">
+            <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-white flex items-center justify-center">
               <Image
                 src={item.imageUrl || '/placeholder.png'}
                 alt={item.name}
                 fill
-                className="object-cover"
+                className="object-contain p-4 transition-transform duration-300 hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                priority
               />
             </div>
           </div>
         </div>
 
-        {/* ========== DETAIL PRODUK ========== */}
-        <div>
-          <h2 className="text-[#7D1972] font-bold text-2xl sm:text-3xl mb-2">
-            Rp {item.price.toLocaleString('id-ID')}
-          </h2>
-
-          <h1 className="text-lg sm:text-xl font-semibold">{item.name}</h1>
-
-          <div className="flex items-center gap-2 text-sm mt-1 text-yellow-500">
-            {stars.fullStars.map((_, i) => (
-              <span key={i}>★</span>
-            ))}
-            {stars.halfStar && <span>☆</span>}
-            {stars.emptyStars.map((_, i) => (
-              <span key={`e-${i}`} className="text-gray-300">
-                ★
+        {/* ========== DETAIL PRODUK & TOKO ========== */}
+        <div className="lg:col-span-7 space-y-6">
+          <div>
+            {/* BADGES */}
+            <div className="flex items-center gap-2 mb-4">
+              <span className="px-3 py-1 bg-fuchsia-50 text-[#7D1972] rounded-full text-xs font-bold uppercase tracking-wider border border-fuchsia-100">
+                {item.category || 'UMKM Banjarmasin'}
               </span>
-            ))}
-            <span className="text-gray-600 ml-1">
-              {randomRating.toFixed(1)}
-            </span>
-            <span className="text-gray-500">Terjual {totalSold}</span>
-          </div>
-
-          <div className="border-t mt-4 pt-4 text-sm">
-            <p className="font-semibold">Kategori:</p>
-            <p className="text-gray-700 mb-4">
-              {item.category || 'UMKM Product'}
-            </p>
-
-            <p className="font-semibold">Deskripsi:</p>
-            <p className="text-gray-600 leading-relaxed text-sm">
-              {item.description || 'Tidak ada deskripsi.'}
-            </p>
-
-            <p className="font-semibold mt-4">Stok Tersedia:</p>
-            <p className="text-gray-700">{item.stock} unit</p>
-          </div>
-        </div>
-
-        {/* ========== TOKO ========== */}
-        <div
-          className="lg:col-span-1 md:col-span-2 w-full md:max-w-md lg:max-w-sm 
-          border rounded-lg p-3 shadow-sm h-fit mx-auto lg:mx-0"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gray-200"></div>
-
-            <div className="leading-tight">
-              <h3 className="font-semibold text-sm">{item.seller || 'Seller'}</h3>
-
-              <p className="text-yellow-500 text-xs">
-                ★ {randomRating.toFixed(1)} ({randomReviews})
-              </p>
+              {item.stock > 0 ? (
+                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                  item.stock > 5 
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                    : 'bg-amber-50 text-amber-700 border-amber-100'
+                }`}>
+                  Stok: {item.stock} Unit
+                </span>
+              ) : (
+                <span className="px-3 py-1 bg-rose-50 text-rose-700 rounded-full text-xs font-bold border border-rose-100">
+                  Stok Habis
+                </span>
+              )}
             </div>
-          </div>
 
-          <div className="mt-2 text-xs leading-tight text-gray-700">
-            <p className="text-pink-600 flex items-center gap-1">
-              📍 <span className="text-gray-500">Lokasi Toko</span>
-            </p>
+            {/* TITLE */}
+            <h1 className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-gray-900 leading-tight mb-3">
+              {item.name}
+            </h1>
 
-            <p className="font-semibold text-sm">Banjarmasin</p>
-            <p className="text-gray-500">Melayani seluruh Indonesia</p>
+            {/* STATS */}
+            <div className="flex items-center gap-3 text-sm text-gray-500 mb-6 flex-wrap">
+              <div className="flex items-center gap-1 bg-amber-50 border border-amber-100 px-2.5 py-0.5 rounded-lg text-amber-600 font-semibold">
+                <span className="text-base leading-none">★</span>
+                <span>{randomRating.toFixed(1)}</span>
+              </div>
+              <span className="text-gray-300">|</span>
+              <span className="hover:text-gray-800 transition cursor-pointer">{randomReviews} Ulasan</span>
+              <span className="text-gray-300">|</span>
+              <span>Terjual <span className="font-semibold text-gray-800">{totalSold}</span> produk</span>
+            </div>
+
+            {/* PRICE CARD */}
+            <div className="bg-gradient-to-r from-fuchsia-50/50 to-transparent border-l-4 border-[#7D1972] pl-4 py-3 mb-6">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Harga Terbaik</span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#7D1972]">
+                Rp {item.price.toLocaleString('id-ID')}
+              </h2>
+            </div>
+
+            <hr className="border-gray-200/80 mb-6" />
+
+            {/* DESCRIPTION */}
+            <div className="mb-8">
+              <h3 className="font-bold text-gray-900 text-base mb-3">Deskripsi Produk</h3>
+              <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed whitespace-pre-line text-sm">
+                {item.description || 'Tidak ada deskripsi lengkap untuk produk ini.'}
+              </div>
+            </div>
+
+            {/* SELLER CARD */}
+            <div className="bg-white border border-gray-150 rounded-2xl p-5 shadow-sm">
+              <h3 className="font-bold text-gray-900 text-sm mb-4 flex items-center gap-1.5">
+                🏪 Informasi Penjual
+              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#7D1972] to-[#9c2292] text-white flex items-center justify-center font-extrabold text-lg shadow-sm shrink-0">
+                    {item.seller ? item.seller.substring(0, 2).toUpperCase() : 'UM'}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-base">{item.seller || 'Seller UMKM'}</h4>
+                    <div className="flex items-center gap-1.5 text-xs text-yellow-500 mt-1">
+                      <span>★</span>
+                      <span className="font-semibold text-gray-700">{randomRating.toFixed(1)}</span>
+                      <span className="text-gray-400">({randomReviews} Rating Toko)</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col text-xs text-gray-500 border-t sm:border-t-0 sm:border-l border-gray-200/80 pt-3.5 sm:pt-0 sm:pl-5 sm:min-w-[180px]">
+                  <span className="text-gray-400 font-medium uppercase tracking-wider text-[10px]">Lokasi Seller</span>
+                  <span className="font-bold text-gray-900 flex items-center gap-1 text-sm mt-0.5">
+                    📍 Banjarmasin
+                  </span>
+                  <span className="text-gray-400 mt-0.5">Melayani pengiriman nasional</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* PRODUK SERUPA */}
-      <h2 className="text-lg font-semibold mt-10 mb-3">
-        Pelanggan lain juga telah melihat barang serupa
-      </h2>
+      {/* RELATED PRODUCTS */}
+      <div className="mt-16 border-t border-gray-200/80 pt-10">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          ✨ Produk Serupa Lainnya
+        </h2>
 
-      <div className="flex gap-4 overflow-x-scroll scroll-smooth no-scrollbar pr-4 justify-start sm:justify-center">
-        {related.map((r) => (
-          <Link
-            key={r.id}
-            href={`/items/${r.id}`}
-            className="min-w-40 sm:min-w-[180px] md:min-w-[200px] rounded-xl 
-            overflow-hidden border shadow-sm bg-white shrink-0"
-          >
-            <div className="relative h-32 bg-gray-200">
-              <Image
-                src={r.imageUrl || '/placeholder.png'}
-                alt={r.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-
-            <div className="bg-[#7D1972] p-3 text-white">
-              <p className="text-sm font-semibold">{r.name}</p>
-              <p className="text-sm mt-1">
-                Rp {r.price.toLocaleString('id-ID')}
-              </p>
-              <p className="text-xs mt-1">{r.stock} stok</p>
-            </div>
-          </Link>
-        ))}
+        {related.length === 0 ? (
+          <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center text-gray-400 text-sm shadow-xs">
+            Tidak ada produk serupa di kategori ini.
+          </div>
+        ) : (
+          <div className="flex gap-6 overflow-x-auto pb-6 pt-1 px-1 scroll-smooth no-scrollbar">
+            {related.map((r) => (
+              <div key={r.id} className="w-[180px] sm:w-[200px] md:w-[220px] shrink-0">
+                <ItemCard item={r} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* FIXED CHECKOUT BAR */}

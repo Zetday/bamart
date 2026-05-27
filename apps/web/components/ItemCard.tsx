@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 
 export interface Item {
   id: number;
@@ -22,6 +22,15 @@ interface ItemCardProps {
   badge?: string;
 }
 
+// === DETERMINISTIC HASH RANDOM (SAFE) ===
+function hashNumber(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) % 100000;
+  }
+  return hash;
+}
+
 export default function ItemCard({
   item,
   rating,
@@ -31,30 +40,34 @@ export default function ItemCard({
   const priceFormatter = useMemo(() => new Intl.NumberFormat('id-ID'), []);
 
   /* ================= BADGE ================= */
-  const badgeOptions = [
+  const badgeOptions = useMemo(() => [
     { text: 'Diskon 50%', class: 'bg-red-200 text-red-800' },
     { text: 'Terlaris', class: 'bg-amber-200 text-amber-800' },
     { text: 'Baru Datang', class: 'bg-emerald-200 text-emerald-800' },
     { text: 'Promo Spesial', class: 'bg-violet-200 text-violet-800' },
     { text: 'Gratis Ongkir', class: 'bg-sky-200 text-sky-800' },
     { text: 'Stok Terbatas', class: 'bg-orange-200 text-orange-800' },
-  ];
+  ], []);
+
+  const seed = useMemo(() => hashNumber(String(item.id)), [item.id]);
 
   /* ================= RANDOM (STABLE) ================= */
-  const [randomRating] = useState(
-    () => rating ?? Number((Math.random() * 1 + 4).toFixed(1))
-  );
+  const randomRating = useMemo(() => {
+    if (rating !== undefined) return rating;
+    return Number((4 + (seed % 10) / 10).toFixed(1));
+  }, [rating, seed]);
 
-  const [randomReviews] = useState(
-    () => reviews ?? Math.floor(Math.random() * 490) + 10
-  );
+  const randomReviews = useMemo(() => {
+    if (reviews !== undefined) return reviews;
+    return 50 + (seed % 450);
+  }, [reviews, seed]);
 
-  const [randomBadge] = useState(() => {
+  const randomBadge = useMemo(() => {
     if (badge) {
       return badgeOptions.find((b) => b.text === badge) ?? badgeOptions[0];
     }
-    return badgeOptions[Math.floor(Math.random() * badgeOptions.length)];
-  });
+    return badgeOptions[seed % badgeOptions.length];
+  }, [badge, badgeOptions, seed]);
 
   /* ================= RATING ================= */
   const fullStars = Math.floor(randomRating);
