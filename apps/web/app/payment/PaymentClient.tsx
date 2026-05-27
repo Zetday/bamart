@@ -3,6 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState, FormEvent } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import CheckoutBreadcrumb from '@/components/CheckoutBreadCrumb';
 import toast from 'react-hot-toast';
 
@@ -241,10 +242,12 @@ export default function PaymentPage() {
                     Scan QR Code di bawah untuk membayar:
                   </p>
                   <div className="inline-block p-4 rounded-2xl bg-white border border-gray-200 dark:border-gray-700 shadow-inner">
-                    <img
+                    <Image
                       src="/payment/qris.svg"
                       alt="QRIS"
-                      className="w-48 h-48 object-contain"
+                      width={192}
+                      height={192}
+                      className="object-contain"
                     />
                   </div>
                   <p className="text-gray-500 dark:text-gray-400 text-xs mt-4">
@@ -306,23 +309,29 @@ export default function PaymentPage() {
                   </p>
                   <div className="grid grid-cols-3 gap-4 items-center justify-center px-4">
                     <div className="bg-white dark:bg-gray-900 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800 flex items-center justify-center h-14">
-                      <img
+                      <Image
                         src="/payment/dana.png"
-                        className="max-h-7 object-contain opacity-90"
+                        width={80}
+                        height={28}
+                        className="max-h-7 object-contain opacity-90 w-auto h-auto"
                         alt="DANA"
                       />
                     </div>
                     <div className="bg-white dark:bg-gray-900 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800 flex items-center justify-center h-14">
-                      <img
+                      <Image
                         src="/payment/ovo.jpg"
-                        className="max-h-8 object-contain rounded-md opacity-90"
+                        width={80}
+                        height={32}
+                        className="max-h-8 object-contain rounded-md opacity-90 w-auto h-auto"
                         alt="OVO"
                       />
                     </div>
                     <div className="bg-white dark:bg-gray-900 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800 flex items-center justify-center h-14">
-                      <img
+                      <Image
                         src="/payment/gopay.png"
-                        className="max-h-5 object-contain opacity-90"
+                        width={80}
+                        height={20}
+                        className="max-h-5 object-contain opacity-90 w-auto h-auto"
                         alt="GoPay"
                       />
                     </div>

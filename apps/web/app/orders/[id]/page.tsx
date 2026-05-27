@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import OrderDetailSkeleton from '@/components/skeleton/OrderDetailSkeleton';
 import { IoReceiptOutline, IoArrowBackOutline } from 'react-icons/io5';
 
@@ -145,7 +146,7 @@ export default function OrderDetailPage() {
                 {order.notes && (
                   <div className="sm:col-span-2 border-t border-gray-100 dark:border-gray-700 pt-4">
                     <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Catatan Pengiriman</h4>
-                    <p className="text-gray-600 dark:text-gray-300 dark:text-gray-400 italic">"{order.notes}"</p>
+                    <p className="text-gray-600 dark:text-gray-300 italic">&ldquo;{order.notes}&rdquo;</p>
                   </div>
                 )}
               </div>
@@ -167,10 +168,12 @@ export default function OrderDetailPage() {
                     <div key={ci.id} className="flex items-center gap-4 py-4 first:pt-0 last:pb-0">
                       <div className="w-16 h-16 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shrink-0 relative overflow-hidden flex items-center justify-center">
                         {imageUrl ? (
-                          <img
+                          <Image
                             src={imageUrl}
                             alt={name}
-                            className="w-full h-full object-contain p-1"
+                            fill
+                            className="object-contain p-1"
+                            sizes="64px"
                           />
                         ) : (
                           <div className="w-full h-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-[10px] text-gray-400 font-medium">
