@@ -23,19 +23,6 @@ function hashNumber(str: string): number {
   return hash;
 }
 
-// === HALF STAR GENERATOR ===
-function renderStars(rating: number) {
-  const full = Math.floor(rating);
-  const half = rating % 1 >= 0.5;
-  const empty = 5 - full - (half ? 1 : 0);
-
-  return {
-    fullStars: Array(full).fill('full'),
-    halfStar: half,
-    emptyStars: Array(empty).fill('empty'),
-  };
-}
-
 export default async function ItemDetailPage({
   params,
 }: {
@@ -71,7 +58,6 @@ export default async function ItemDetailPage({
   const seed = hashNumber(String(item.id));
   const randomRating = 4 + (seed % 100) / 100;
   const randomReviews = 50 + (seed % 850);
-  const stars = renderStars(randomRating);
 
   return (
     <div className="relative w-full max-w-[1400px] mx-auto px-4 md:px-8 py-8 pt-20 sm:pt-20 pb-32 sm:pb-40 lg:pb-16 min-h-screen">
@@ -199,7 +185,7 @@ export default async function ItemDetailPage({
       {/* RELATED PRODUCTS */}
       <div className="mt-16 border-t border-gray-200/80 pt-10">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-          ✨ Produk Serupa Lainnya
+          Produk Serupa Lainnya
         </h2>
 
         {related.length === 0 ? (

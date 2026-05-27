@@ -127,12 +127,12 @@ export default function Sidebar({
 
     if (maxSliderRef.current) {
       const gradient = `linear-gradient(to right, 
-        #bbbfbf 0%, 
-        #bbbfbf ${minPercent}%, 
-        #0A9A4C ${minPercent}%, 
-        #0A9A4C ${maxPercent}%, 
-        #bbbfbf ${maxPercent}%, 
-        #bbbfbf 100%)`;
+        #cbd5e1 0%, 
+        #cbd5e1 ${minPercent}%, 
+        #7D1972 ${minPercent}%, 
+        #7D1972 ${maxPercent}%, 
+        #cbd5e1 ${maxPercent}%, 
+        #cbd5e1 100%)`;
       maxSliderRef.current.style.background = gradient;
     }
   }, [minPrice, maxPrice]);
@@ -143,8 +143,10 @@ export default function Sidebar({
   };
 
   const wrapperClass = isMobile
-    ? 'flex-1 overflow-y-auto pr-5 pl-8 py-8 space-y-6 bg-white'
-    : 'fixed top-16 left-0 h-[calc(100vh-4rem)] w-72 overflow-y-auto pr-5 pl-8 py-8 space-y-6 bg-white';
+    ? 'flex-1 overflow-hidden pr-5 pl-8 py-8 space-y-6 bg-white dark:bg-slate-900'
+    : hasActiveFilters
+    ? 'w-full pr-5 pl-8 py-8 space-y-6 bg-white dark:bg-slate-900'
+    : 'fixed top-20 left-0 h-[calc(100vh-5rem)] w-72 overflow-hidden pr-5 pl-8 py-8 space-y-6 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-slate-800/50';
 
   const renderContent = () => (
     <div className={wrapperClass}>
@@ -153,32 +155,32 @@ export default function Sidebar({
         <div>
           <button
             onClick={onResetFilters}
-            className="w-full px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
+            className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors font-semibold text-xs"
           >
             Reset Semua Filter
           </button>
-          <hr className="mt-4 border-gray-300" />
+          <hr className="mt-4 border-slate-100 dark:border-slate-800/80" />
         </div>
       )}
 
       {/* ===== PRODUK UMKM ===== */}
       <div>
-        <h2 className="font-bold text-gray-900 text-sm mb-2">
-          Jelajahi Produk UMKM Banjarmasin
+        <h2 className="font-bold text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider mb-2.5">
+          Jelajahi Produk UMKM
         </h2>
 
-        <div className="space-y-1 text-sm text-gray-700">
+        <div className="space-y-1.5 text-sm text-slate-700 dark:text-slate-300 font-medium">
           {loadingCategories ? (
-            <p className="text-gray-400">Memuat kategori...</p>
+            <p className="text-slate-400 dark:text-slate-500 text-xs">Memuat kategori...</p>
           ) : categories.length === 0 ? (
-            <p className="text-gray-400">Tidak ada kategori</p>
+            <p className="text-slate-400 dark:text-slate-500 text-xs">Tidak ada kategori</p>
           ) : (
             categories.slice(0, 3).map((category) => (
               <a
                 key={category.id}
                 href="#"
                 onClick={(e) => handleCategoryClick(e, category.name)}
-                className="block hover:underline"
+                className="block hover:underline hover:text-[#7D1972] dark:hover:text-fuchsia-400 hover:translate-x-0.5 transition-all duration-150"
               >
                 {category.name}
               </a>
@@ -186,20 +188,20 @@ export default function Sidebar({
           )}
         </div>
 
-        <hr className="mt-4 border-gray-300" />
+        <hr className="mt-4 border-slate-100 dark:border-slate-800/80" />
       </div>
 
       {/* ===== HARGA ===== */}
       <div>
-        <h3 className="font-bold text-gray-900 mb-2 text-sm">Harga</h3>
-        <p className="font-bold text-black mb-3">
+        <h3 className="font-bold text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider mb-2.5">Harga</h3>
+        <p className="font-extrabold text-slate-800 dark:text-slate-200 text-sm mb-3">
           Rp{numberFormatter.format(minPrice)} – Rp
           {numberFormatter.format(maxPrice)}
           {maxPrice >= 5000000 ? '+' : ''}
         </p>
 
         {/* PRICE RANGE COMPONENT - Amazon Style */}
-        <div className="relative mb-8">
+        <div className="relative mb-6">
           <div className="s-range-container">
             {/* MIN SLIDER */}
             <div className="s-range-input-container s-lower-bound">
@@ -246,130 +248,143 @@ export default function Sidebar({
 
           <button
             onClick={handleApplyFilter}
-            className="mt-3 px-4 py-1.5 text-sm border border-gray-400 rounded-md bg-white hover:bg-gray-50 transition-colors"
+            className="mt-3 px-4 py-1.5 text-xs font-bold border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 hover:border-[#7D1972] hover:text-[#7D1972] dark:hover:border-fuchsia-500 dark:hover:text-fuchsia-400 transition-colors cursor-pointer"
           >
             Terapkan
           </button>
         </div>
+        <hr className="mt-4 border-slate-100 dark:border-slate-800/80" />
       </div>
 
       {/* ===== PROMO ===== */}
       <div>
-        <h3 className="font-bold text-gray-900 mb-2 text-sm">
+        <h3 className="font-bold text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider mb-2.5">
           Promo & Diskon
         </h3>
-        <a href="#" className="block hover:underline text-sm">
-          Semua Promo
-        </a>
-        <a href="#" className="block hover:underline text-sm">
-          Produk Diskon Hari Ini
-        </a>
-        <a href="#" className="block hover:underline text-sm">
-          Gratis Ongkir
-        </a>
+        <div className="space-y-1.5 text-sm text-slate-700 dark:text-slate-300 font-medium">
+          <a href="#" className="block hover:underline hover:text-[#7D1972] dark:hover:text-fuchsia-400">
+            Semua Promo
+          </a>
+          <a href="#" className="block hover:underline hover:text-[#7D1972] dark:hover:text-fuchsia-400">
+            Produk Diskon Hari Ini
+          </a>
+          <a href="#" className="block hover:underline hover:text-[#7D1972] dark:hover:text-fuchsia-400">
+            Gratis Ongkir
+          </a>
+        </div>
+        <hr className="mt-4 border-slate-100 dark:border-slate-800/80" />
       </div>
 
       {/* ===== ULASAN ===== */}
       <div>
-        <h3 className="font-bold text-gray-900 mb-1 text-sm">
+        <h3 className="font-bold text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider mb-2.5">
           Ulasan Pelanggan
         </h3>
-        <div className="flex items-center gap-1 text-orange-500 text-sm">
-          ⭐⭐⭐⭐⭐ <span className="text-gray-700">& Up</span>
+        <div className="flex items-center gap-1.5 text-amber-500 text-sm font-semibold">
+          <div className="flex items-center gap-0.5">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <span className="text-slate-650 dark:text-slate-350">& Up</span>
         </div>
+        <hr className="mt-4 border-slate-100 dark:border-slate-800/80" />
       </div>
 
       {/* ===== KATEGORI ===== */}
-      <h3 className="font-bold text-gray-900 mb-2 text-sm">Kategori UMKM</h3>
-      <div className="space-y-1 text-sm text-gray-700">
-        {loadingCategories ? (
-          <p className="text-gray-400">Memuat kategori...</p>
-        ) : categories.length === 0 ? (
-          <p className="text-gray-400">Tidak ada kategori</p>
-        ) : (
-          <>
-            {categories.slice(0, 4).map((category) => (
-              <a
-                key={category.id}
-                href="#"
-                onClick={(e) => handleCategoryClick(e, category.name)}
-                className="block hover:underline"
-              >
-                {category.name}
-              </a>
-            ))}
-
-            {categories.length > 4 && (
-              <>
-                <button
-                  onClick={toggleMore}
-                  className="flex items-center gap-1 text-green-600 hover:underline"
+      <div>
+        <h3 className="font-bold text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider mb-2.5">Kategori UMKM</h3>
+        <div className="space-y-1.5 text-sm text-slate-700 dark:text-slate-300 font-medium">
+          {loadingCategories ? (
+            <p className="text-slate-400 dark:text-slate-500 text-xs">Memuat kategori...</p>
+          ) : categories.length === 0 ? (
+            <p className="text-slate-400 dark:text-slate-500 text-xs">Tidak ada kategori</p>
+          ) : (
+            <>
+              {categories.slice(0, 4).map((category) => (
+                <a
+                  key={category.id}
+                  href="#"
+                  onClick={(e) => handleCategoryClick(e, category.name)}
+                  className="block hover:underline hover:text-[#7D1972] dark:hover:text-fuchsia-400 hover:translate-x-0.5 transition-all duration-150"
                 >
-                  <span>Lainnya</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      showMore ? 'rotate-180' : ''
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
+                  {category.name}
+                </a>
+              ))}
 
-                {showMore && (
-                  <div className="pl-2 space-y-1">
-                    {categories.slice(4).map((category) => (
-                      <a
-                        key={category.id}
-                        href="#"
-                        onClick={(e) => handleCategoryClick(e, category.name)}
-                        className="block hover:underline"
-                      >
-                        {category.name}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </>
-        )}
+              {categories.length > 4 && (
+                <>
+                  <button
+                    onClick={toggleMore}
+                    className="flex items-center gap-1 text-[#7D1972] dark:text-fuchsia-450 hover:underline text-xs font-semibold"
+                  >
+                    <span>Lainnya</span>
+                    <svg
+                      className={`w-3 h-3 transition-transform ${
+                        showMore ? 'rotate-180' : ''
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+
+                  {showMore && (
+                    <div className="pl-2 pt-1.5 space-y-1.5 border-l border-slate-100 dark:border-slate-800">
+                      {categories.slice(4).map((category) => (
+                        <a
+                          key={category.id}
+                          href="#"
+                          onClick={(e) => handleCategoryClick(e, category.name)}
+                          className="block hover:underline hover:text-[#7D1972] dark:hover:text-fuchsia-400 hover:translate-x-0.5 transition-all duration-150"
+                        >
+                          {category.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </div>
+        <hr className="mt-4 border-slate-100 dark:border-slate-800/80" />
       </div>
 
       {/* ===== BRAND ===== */}
-      <div>
-        <h3 className="font-bold text-gray-900 mb-2 text-sm">
+      <div className="pb-4">
+        <h3 className="font-bold text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-wider mb-2.5">
           Brand Lokal Populer
         </h3>
 
-        {loadingBrands ? (
-          <p className="text-gray-400 text-sm">Memuat brand...</p>
-        ) : brands.length === 0 ? (
-          <p className="text-gray-400 text-sm">Belum ada seller</p>
-        ) : (
-          brands.map((brand) => (
-            <label
-              key={brand.id}
-              className="flex items-center gap-2 text-sm cursor-pointer"
-            >
-              <input
-                type="radio"
-                name="brand"
-                value={brand.name}
-                checked={selectedBrand === brand.name}
-                onChange={() => handleBrandChange(brand.name)}
-                className="h-4 w-4 accent-green-600"
-              />
-              {brand.name}
-            </label>
-          ))
-        )}
+        <div className="space-y-2">
+          {loadingBrands ? (
+            <p className="text-slate-400 dark:text-slate-500 text-xs">Memuat brand...</p>
+          ) : brands.length === 0 ? (
+            <p className="text-slate-400 dark:text-slate-500 text-xs">Belum ada seller</p>
+          ) : (
+            brands.map((brand) => (
+              <label
+                key={brand.id}
+                className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 font-medium cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="brand"
+                  value={brand.name}
+                  checked={selectedBrand === brand.name}
+                  onChange={() => handleBrandChange(brand.name)}
+                  className="h-4 w-4 accent-[#7D1972] cursor-pointer"
+                />
+                <span className="hover:text-[#7D1972] dark:hover:text-fuchsia-400 transition-colors">{brand.name}</span>
+              </label>
+            ))
+          )}
+        </div>
       </div>
 
       {/* AMAZON-STYLE SLIDER CSS */}
@@ -411,7 +426,7 @@ export default function Sidebar({
         .s-upper-bound .s-range-input {
           z-index: 2;
           border-radius: 3px;
-          background: #bbbfbf;
+          background: #cbd5e1;
           pointer-events: none;
         }
 
@@ -420,10 +435,10 @@ export default function Sidebar({
           -webkit-appearance: none;
           appearance: none;
           pointer-events: auto;
-          width: 28px;
-          height: 28px;
-          background: #0a9a4c;
-          border: 5px solid white;
+          width: 24px;
+          height: 24px;
+          background: #7D1972;
+          border: 4px solid white;
           border-radius: 50%;
           box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
           cursor: pointer;
@@ -431,16 +446,16 @@ export default function Sidebar({
         }
 
         .s-range-input::-webkit-slider-thumb:hover {
-          background: #088a42;
+          background: #65145c;
         }
 
         /* Firefox - Thumb */
         .s-range-input::-moz-range-thumb {
           pointer-events: auto;
-          width: 18px;
-          height: 18px;
-          background: #0a9a4c;
-          border: 5px solid white;
+          width: 16px;
+          height: 16px;
+          background: #7D1972;
+          border: 4px solid white;
           border-radius: 50%;
           box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
           cursor: pointer;
@@ -448,7 +463,7 @@ export default function Sidebar({
         }
 
         .s-range-input::-moz-range-thumb:hover {
-          background: #088a42;
+          background: #65145c;
         }
 
         /* Firefox - Remove default track */
@@ -463,12 +478,12 @@ export default function Sidebar({
         }
 
         .s-range-input:focus::-webkit-slider-thumb {
-          box-shadow: 0 0 0 3px rgba(10, 154, 76, 0.2),
+          box-shadow: 0 0 0 3px rgba(125, 25, 114, 0.2),
             0 1px 4px rgba(0, 0, 0, 0.3);
         }
 
         .s-range-input:focus::-moz-range-thumb {
-          box-shadow: 0 0 0 3px rgba(10, 154, 76, 0.2),
+          box-shadow: 0 0 0 3px rgba(125, 25, 114, 0.2),
             0 1px 4px rgba(0, 0, 0, 0.3);
         }
       `}</style>
@@ -480,7 +495,11 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="hidden md:block w-72 bg-white border-r border-gray-300">
+    <aside className={
+      hasActiveFilters
+        ? "hidden md:block w-72 shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/50 dark:border-slate-800/50 min-h-screen"
+        : "hidden md:block w-72 bg-white dark:bg-slate-900"
+    }>
       {renderContent()}
     </aside>
   );
