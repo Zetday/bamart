@@ -232,9 +232,11 @@ export default function ItemsPage() {
             </svg>
             Filter & Kategori
           </button>
-          <span className="text-gray-500 text-sm">
-            ({filteredItems.length} produk)
-          </span>
+          {searchParams.get('search') && (
+            <span className="text-gray-500 text-sm">
+              ({filteredItems.length} produk)
+            </span>
+          )}
         </div>
         <div className="mb-4 flex flex-wrap gap-2 items-center">
           {searchParams.get('search') && (
@@ -272,9 +274,11 @@ export default function ItemsPage() {
             </span>
           )}
 
-          <span className="text-gray-500 text-sm hidden md:inline">
-            ({filteredItems.length} produk)
-          </span>
+          {searchParams.get('search') && (
+            <span className="text-gray-500 text-sm hidden md:inline">
+              ({filteredItems.length} produk)
+            </span>
+          )}
 
           {hasActiveFilters && (
             <button
