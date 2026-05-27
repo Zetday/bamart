@@ -48,7 +48,7 @@ export default function OrderSuccessPage() {
           <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mb-6 animate-bounce dark:bg-emerald-950/40 dark:border-emerald-900 dark:text-emerald-400">
             <svg
               className="w-12 h-12"
-              fill="none; currentColor"
+              fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
               viewBox="0 0 24 24"
