@@ -45,6 +45,10 @@ export default function LoginPage() {
       return;
     }
 
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('page-navigation-start'));
+    }
+
     if (user.role === 'ADMIN') {
       toast.success('Selamat datang Admin!');
       router.push('/dashboard/admin');
@@ -54,8 +58,7 @@ export default function LoginPage() {
     } else {
       toast.success('Selamat berbelanja!');
       router.push('/items'); // BUYER
-    } // Setelah login → arahkan ke halaman marketplace
-    setLoading(false);
+    }
   };
 
   return (

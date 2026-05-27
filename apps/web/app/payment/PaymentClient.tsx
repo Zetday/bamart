@@ -88,11 +88,13 @@ export default function PaymentPage() {
         return;
       }
 
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('page-navigation-start'));
+      }
       // Redirect ke halaman sukses mock
       router.push(`/success?orderId=${orderId}`);
     } catch {
       toast.error('Terjadi kesalahan saat memproses pembayaran');
-    } finally {
       setLoading(false);
     }
   }

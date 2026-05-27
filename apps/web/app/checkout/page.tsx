@@ -62,10 +62,13 @@ export default function CheckoutPage() {
     const redirectUrl = result.data?.redirect || result.redirect;
 
     if (redirectUrl) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('page-navigation-start'));
+      }
       router.push(redirectUrl);
+    } else {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   function renderValue(value: string) {

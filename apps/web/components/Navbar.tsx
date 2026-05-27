@@ -100,6 +100,10 @@ export default function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('page-navigation-start'));
+    }
+
     if (searchQuery.trim()) {
       router.push(`/items?search=${encodeURIComponent(searchQuery.trim())}`);
     } else {
@@ -129,6 +133,10 @@ export default function Navbar() {
         duration: 3000,
       });
       return;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('page-navigation-start'));
     }
 
     router.push('/cart');

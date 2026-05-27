@@ -30,6 +30,9 @@ export default function DashboardSidebar({ role, userName, userEmail }: SidebarP
   const isActive = (path: string) => pathname === path;
 
   const navigate = (path: string) => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('page-navigation-start'));
+    }
     startTransition(() => router.push(path));
   };
 

@@ -44,6 +44,9 @@ export default function RegisterPage() {
 
     // Redirect setelah 1–1.5 detik
     setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('page-navigation-start'));
+      }
       router.push('/login');
     }, 1300);
   };
