@@ -219,7 +219,7 @@ export default function ItemsPage() {
         />
       </aside>
 
-      <main className="flex-1 p-6">
+      <main className="flex-1 pt-24 p-6">
         {/* Mobile filter bar */}
         <div className="flex md:hidden items-center justify-between gap-4 mb-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
           <button
