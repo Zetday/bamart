@@ -102,7 +102,7 @@ export default function PaymentPage() {
   return (
     <>
       <section className="bg-white py-6 antialiased">
-        <div className="mx-auto max-w-screen-xl px-4 2xl:px-0 pt-18">
+        <div className="mx-auto max-w-7xl px-4 2xl:px-0 pt-18">
           <CheckoutBreadcrumb current="payment" />
 
           <div className="max-w-7xl mt-6">

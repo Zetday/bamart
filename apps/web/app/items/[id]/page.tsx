@@ -146,7 +146,7 @@ export default async function ItemDetailPage({
             </div>
 
             {/* PRICE CARD */}
-            <div className="bg-gradient-to-r from-fuchsia-50/50 to-transparent border-l-4 border-[#7D1972] pl-4 py-3 mb-6">
+            <div className="bg-linear-to-r from-fuchsia-50/50 to-transparent border-l-4 border-[#7D1972] pl-4 py-3 mb-6">
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Harga Terbaik</span>
               <h2 className="text-3xl sm:text-4xl font-black text-[#7D1972]">
                 Rp {item.price.toLocaleString('id-ID')}
@@ -170,7 +170,7 @@ export default async function ItemDetailPage({
               </h3>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#7D1972] to-[#9c2292] text-white flex items-center justify-center font-extrabold text-lg shadow-sm shrink-0">
+                  <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-[#7D1972] to-[#9c2292] text-white flex items-center justify-center font-extrabold text-lg shadow-sm shrink-0">
                     {item.seller ? item.seller.substring(0, 2).toUpperCase() : 'UM'}
                   </div>
                   <div>
