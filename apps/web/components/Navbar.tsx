@@ -324,7 +324,7 @@ export default function Navbar() {
 
                 <Link
                   href="/register"
-                  className="py-1.5 md:py-2 px-3 md:px-4 bg-linear-to-r from-purple-700 to-[#7D1972] hover:from-purple-800 hover:to-[#65145c] text-white font-semibold rounded-xl text-xs md:text-sm transition-all duration-300 shadow-xs hover:shadow-md"
+                  className="py-1.5 md:py-2 px-3 md:px-4 bg-[#7D1972] hover:bg-[#9E1E93] text-white font-semibold rounded-xl text-xs md:text-sm transition-all duration-300 shadow-xs hover:shadow-md"
                 >
                   Daftar
                 </Link>
