@@ -41,19 +41,16 @@ export default function OrderSuccessPage() {
   });
 
   return (
-    <div className="pt-24 bg-white py-8 md:py-16 mt-20 flex justify-center">
-      <div className="max-w-2xl px-4 2xl:px-0">
-        {/* ICON SUCCESS */}
-        <div className="flex justify-center mb-6">
-          <div
-            className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center 
-                          animate-bounce"
-          >
+    <div className="min-h-screen bg-gray-50/50 pt-20 sm:pt-24 pb-16 dark:bg-gray-900 flex items-center justify-center">
+      <div className="mx-auto max-w-2xl px-4 w-full">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-8 flex flex-col items-center">
+          {/* ICON SUCCESS */}
+          <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mb-6 animate-bounce dark:bg-emerald-950/40 dark:border-emerald-900 dark:text-emerald-400">
             <svg
-              className="w-12 h-12 text-green-600"
-              fill="none"
+              className="w-12 h-12"
+              fill="none; currentColor"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.5"
               viewBox="0 0 24 24"
             >
               <path
@@ -63,81 +60,67 @@ export default function OrderSuccessPage() {
               />
             </svg>
           </div>
-        </div>
 
-        {/* TITLE */}
-        <h2
-          className="text-xl font-semibold text-gray-900 sm:text-2xl mb-2 text-center 
-                       animate-fade-in"
-        >
-          Terima kasih atas pesanan Anda!
-        </h2>
+          {/* TITLE */}
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+            Terima kasih atas pesanan Anda!
+          </h2>
 
-        {/* SUBTEXT */}
-        <p className="text-gray-500 mb-6 md:mb-8 text-center animate-fade-in">
-          Pesanan <span className="font-medium text-gray-900">#{order.id}</span>{' '}
-          berhasil dibuat. Kami akan menghubungi Anda setelah pesanan siap
-          dikirim.
-        </p>
+          {/* SUBTEXT */}
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center mb-8 max-w-md leading-relaxed">
+            Pesanan <span className="font-bold text-gray-900 dark:text-white">#{order.id}</span> berhasil dibuat. Kami akan menghubungi Anda setelah pesanan siap dikirim.
+          </p>
 
-        {/* DETAIL BOX */}
-        <div
-          className="space-y-4 sm:space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-6 
-                        animate-fade-in"
-        >
-          <dl className="sm:flex items-center justify-between gap-4">
-            <dt className="text-gray-500">Tanggal</dt>
-            <dd className="font-medium text-gray-900 sm:text-end">
-              {formattedDate}
-            </dd>
-          </dl>
+          {/* DETAIL BOX */}
+          <div className="w-full space-y-3 rounded-xl border border-gray-100 bg-gray-50/50 p-5 dark:border-gray-700 dark:bg-gray-900/50">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500 dark:text-gray-400">Tanggal</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{formattedDate}</span>
+            </div>
 
-          <dl className="sm:flex items-center justify-between gap-4">
-            <dt className="text-gray-500">Nama Penerima</dt>
-            <dd className="font-medium text-gray-900 sm:text-end">
-              {order.fullName}
-            </dd>
-          </dl>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500 dark:text-gray-400">Nama Penerima</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{order.fullName}</span>
+            </div>
 
-          <dl className="sm:flex items-center justify-between gap-4">
-            <dt className="text-gray-500">Alamat</dt>
-            <dd className="font-medium text-gray-900 sm:text-end">
-              {order.address}, {order.city}
-            </dd>
-          </dl>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500 dark:text-gray-400">Alamat</span>
+              <span className="font-semibold text-gray-900 dark:text-white text-right max-w-[180px] sm:max-w-xs truncate">
+                {order.address}, {order.city}
+              </span>
+            </div>
 
-          <dl className="sm:flex items-center justify-between gap-4">
-            <dt className="text-gray-500">Telepon</dt>
-            <dd className="font-medium text-gray-900 sm:text-end">
-              {order.phone}
-            </dd>
-          </dl>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500 dark:text-gray-400">Telepon</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{order.phone}</span>
+            </div>
 
-          <dl className="sm:flex items-center justify-between gap-4">
-            <dt className="text-gray-500">Total Pembayaran</dt>
-            <dd className="font-medium text-gray-900 sm:text-end">
-              Rp {order.totalPrice.toLocaleString('id-ID')}
-            </dd>
-          </dl>
-        </div>
+            <hr className="border-gray-100 dark:border-gray-700" />
 
-        {/* BUTTONS */}
-        <div className="flex items-center space-x-4 mt-6 justify-center animate-fade-in">
-          <Link
-            href={`/orders`}
-            className="text-white bg-[#7D1972] hover:bg-[#9E1E93]
-                       font-medium rounded-lg text-sm px-5 py-2.5 transition"
-          >
-            Lihat Riwayat Pesanan
-          </Link>
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-base font-extrabold text-gray-900 dark:text-white">Total Tagihan</span>
+              <span className="text-lg font-black text-[#7D1972] dark:text-fuchsia-400">
+                Rp {order.totalPrice.toLocaleString('id-ID')}
+              </span>
+            </div>
+          </div>
 
-          <Link
-            href="/items"
-            className="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg 
-                       border border-gray-200 hover:bg-gray-100 hover:text-[#7D1972] transition"
-          >
-            Kembali Belanja
-          </Link>
+          {/* BUTTONS */}
+          <div className="flex flex-col sm:flex-row gap-3 mt-8 w-full justify-center">
+            <Link
+              href={`/orders`}
+              className="flex items-center justify-center rounded-xl py-3 px-6 text-sm font-bold text-white bg-[#7D1972] hover:bg-[#9E1E93] hover:shadow transition duration-200"
+            >
+              Lihat Riwayat Pesanan
+            </Link>
+
+            <Link
+              href="/items"
+              className="flex items-center justify-center gap-2 rounded-xl py-3 px-6 text-sm font-bold text-[#7D1972] bg-white border-2 border-[#7D1972] hover:bg-fuchsia-50/40 dark:bg-gray-800 dark:hover:bg-gray-700 transition duration-200"
+            >
+              Kembali Belanja
+            </Link>
+          </div>
         </div>
       </div>
     </div>
