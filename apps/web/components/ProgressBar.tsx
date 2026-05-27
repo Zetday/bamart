@@ -8,10 +8,13 @@ export default function ProgressBar() {
   const searchParams = useSearchParams();
   const [isNavigating, setIsNavigating] = useState(false);
 
-  useEffect(() => {
-    // Turn off progress bar when path or search query changes
+  const currentPath = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
+  const [prevPath, setPrevPath] = useState(currentPath);
+
+  if (currentPath !== prevPath) {
+    setPrevPath(currentPath);
     setIsNavigating(false);
-  }, [pathname, searchParams]);
+  }
 
   useEffect(() => {
     // 1. Intercept all internal anchor clicks

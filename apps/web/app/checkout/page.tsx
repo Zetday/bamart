@@ -71,7 +71,7 @@ export default function CheckoutPage() {
     }
   }
 
-  function renderValue(value: string) {
+  function renderValue() {
     return (
       <span className="inline-block h-4 w-24 rounded bg-gray-200 animate-pulse" />
     );
@@ -288,7 +288,7 @@ export default function CheckoutPage() {
                     <span>Subtotal</span>
                     <span className="text-gray-900 dark:text-white font-medium">
                       {subtotalLoading
-                        ? renderValue('')
+                        ? renderValue()
                         : `Rp ${subtotal.toLocaleString('id-ID')}`}
                     </span>
                   </div>
@@ -308,7 +308,7 @@ export default function CheckoutPage() {
                     <span className="text-base font-extrabold text-gray-900 dark:text-white">Total Tagihan</span>
                     <span className="text-lg sm:text-xl font-black text-[#7D1972]">
                       {subtotalLoading
-                        ? renderValue('')
+                        ? renderValue()
                         : `Rp ${total.toLocaleString('id-ID')}`}
                     </span>
                   </div>
