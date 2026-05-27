@@ -166,7 +166,7 @@ export default function ItemsPage() {
         UI
   ------------------------------ */
   return (
-    <div className="flex pt-15 md:pl-8">
+    <div className="flex md:pl-8">
       {/* Mobile Drawer Backdrop */}
       {isFilterOpen && (
         <div
@@ -272,7 +272,7 @@ export default function ItemsPage() {
             </span>
           )}
 
-          <span className="text-gray-500 text-sm">
+          <span className="text-gray-500 text-sm hidden md:inline">
             ({filteredItems.length} produk)
           </span>
 
