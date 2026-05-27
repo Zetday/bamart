@@ -44,6 +44,8 @@ interface OrderDetail {
   postalCode: string;
   notes: string;
   totalPrice: number;
+  status: string;
+  orderDate: string;
   items: OrderItemDetail[];
 }
 
@@ -158,6 +160,36 @@ export default function OrdersSellerClient({ rows }: { rows: OrderRow[] }) {
             </div>
 
             <div className="bg-gray-50 p-4 rounded-xl space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Status:</span>
+                <span
+                  className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                    detailData.status === 'PENDING'
+                      ? 'bg-yellow-100 text-yellow-700'
+                      : detailData.status === 'PAID'
+                      ? 'bg-blue-100 text-blue-700'
+                      : detailData.status === 'SHIPPED'
+                      ? 'bg-purple-100 text-purple-700'
+                      : detailData.status === 'COMPLETED'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
+                  }`}
+                >
+                  {detailData.status}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Tanggal:</span>
+                <span className="font-semibold text-slate-800">
+                  {new Date(detailData.orderDate).toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
+              </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Nama:</span>
                 <span className="font-semibold">{detailData.fullName}</span>
